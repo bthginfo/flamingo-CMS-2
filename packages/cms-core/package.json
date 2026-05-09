@@ -1,0 +1,12 @@
+{
+  "name": "@flamingo/cms-core",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@flamingo/shared": "0.1.0"
+  }
+}

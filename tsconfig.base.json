@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@flamingo/cms-core": ["packages/cms-core/src/index.ts"],
+      "@flamingo/db": ["packages/db/src/index.ts"],
+      "@flamingo/funding": ["packages/funding/src/index.ts"],
+      "@flamingo/sections": ["packages/sections/src/index.tsx"],
+      "@flamingo/shared": ["packages/shared/src/index.ts"]
+    }
+  },
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "scripts/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}
