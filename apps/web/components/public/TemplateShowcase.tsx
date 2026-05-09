@@ -219,10 +219,10 @@ export function AdminDemoShowcase() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a className="showcase-button" href="/admin">
-              Admin oeffnen
+              Echtes Admin oeffnen
             </a>
-            <a className="showcase-button showcase-button-secondary" href="/admin/login">
-              Demo Login
+            <a className="showcase-button showcase-button-secondary" href="/admin-demo">
+              Admin-Demo starten
             </a>
           </div>
         </div>
