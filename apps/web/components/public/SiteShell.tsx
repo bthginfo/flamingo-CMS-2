@@ -34,6 +34,9 @@ export function SiteShell({
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <a className="showcase-button showcase-button-compact hidden lg:inline-flex" href="/angebot">
+              Angebot
+            </a>
             <a className="showcase-button showcase-button-compact hidden sm:inline-flex" href="/beispiele">
               Templates
             </a>
@@ -53,6 +56,9 @@ export function SiteShell({
             </p>
           </div>
           <div className="grid gap-2 text-sm text-white/60">
+            <a href="/angebot">Angebot</a>
+            <a href="/prozess">Prozess</a>
+            <a href="/admin-demo">Admin-Demo</a>
             <a href="/impressum">Impressum</a>
             <a href="/datenschutz">Datenschutz</a>
           </div>
