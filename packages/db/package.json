@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./client": "./src/client.ts"
+    "./client": "./src/client.ts",
+    "./site-repository": "./src/site-repository.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.30.10",

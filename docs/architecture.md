@@ -5,6 +5,7 @@ Das System ist als Monorepo aufgebaut:
 - `apps/web`: Next.js App Router für Showcase, Tenant Rendering und Admin.
 - `packages/cms-core`: zentrale Typen, Rollen, Permissions, Versioning und Validierung.
 - `packages/db`: Drizzle Schema für PostgreSQL.
+- `packages/db/src/site-repository.ts`: erste DB-backed Read-Repository-Implementierung für Tenant/Page/Section Rendering.
 - `packages/sections`: globale Section Registry inklusive Schema, Defaults, Admin-Feldern und Renderer.
 - `packages/funding`: Tirol Förderrechner mit testbarer Business-Logik.
 - `packages/shared`: Utility-Typen und Hilfsfunktionen.

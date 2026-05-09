@@ -14,7 +14,8 @@
     "check:hardcoded-content": "tsx scripts/check-hardcoded-content.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed:showcase": "tsx scripts/seed-showcase.ts"
   },
   "workspaces": [
     "apps/*",

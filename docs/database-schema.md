@@ -8,6 +8,7 @@ The Drizzle schema lives in `packages/db/src/index.ts`.
 npm run db:generate
 npm run db:push
 npm run db:studio
+npm run db:seed:showcase
 ```
 
 `DATABASE_URL` is required and documented in `.env.example`.
@@ -24,3 +25,14 @@ npm run db:studio
 - Operations: `redirects`, `audit_logs`, `publish_events`, `integrations`, `webhook_events`
 
 The current app still uses the in-memory seed adapter for UI development. The DB client in `packages/db/src/client.ts` is the target for the next repository implementation pass.
+
+## Showcase Seed
+
+`npm run db:seed:showcase` is idempotent. It maps the local CMS seed ids to deterministic UUIDs and upserts:
+
+- FlamingoMedia tenant and primary domain
+- demo users and tenant roles
+- navigation, global settings, theme and SEO defaults
+- pages and sections
+- project collection and items
+- funding lead form definition

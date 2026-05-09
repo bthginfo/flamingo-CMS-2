@@ -40,6 +40,8 @@ npm run validate:sections
 npm run validate:seeds
 npm run check:hardcoded-content
 npm test
+npm run db:generate
+npm run db:seed:showcase
 ```
 
 ## Deployment
