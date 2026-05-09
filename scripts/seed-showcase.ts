@@ -26,11 +26,18 @@ const editorUserId = uuidFromKey("user_tenant_editor");
 const tenantId = uuidFromKey(showcaseTenant.id);
 const now = new Date();
 
-try {
-  await seed();
-  console.log("Seeded FlamingoMedia showcase tenant.");
-} finally {
-  await sql.end();
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
+
+async function main() {
+  try {
+    await seed();
+    console.log("Seeded FlamingoMedia showcase tenant.");
+  } finally {
+    await sql.end();
+  }
 }
 
 async function seed() {
