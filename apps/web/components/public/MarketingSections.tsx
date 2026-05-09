@@ -1,3 +1,5 @@
+import { PublicContactForm } from "./PublicContactForm";
+
 const steps = [
   {
     title: "Template waehlen",
@@ -194,24 +196,7 @@ export function ContactSection() {
             <span>Innsbruck / Muenchen / DACH</span>
           </div>
         </div>
-        <form className="rounded-lg border border-white/10 bg-white p-5 text-black shadow-soft">
-          {["Name", "E-Mail", "Branche", "Projektziel"].map((label) => (
-            <label key={label} className="mb-4 grid gap-2 text-sm font-bold">
-              {label}
-              {label === "Projektziel" ? (
-                <textarea className="min-h-[130px] rounded-lg border border-black/10 p-3" />
-              ) : (
-                <input className="rounded-lg border border-black/10 p-3" />
-              )}
-            </label>
-          ))}
-          <button className="showcase-button w-full" type="button">
-            Anfrage vorbereiten
-          </button>
-          <p className="mt-3 text-xs leading-5 text-black/45">
-            Demo-Formular. Die echte Submission wird im naechsten CMS-Backend-Schritt verbunden.
-          </p>
-        </form>
+        <PublicContactForm />
       </div>
     </section>
   );
