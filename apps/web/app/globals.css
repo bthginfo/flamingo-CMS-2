@@ -7,6 +7,7 @@
   --background: #fbfaf8;
   --foreground: #101317;
   --brand: #f06472;
+  --line: rgba(16, 19, 23, 0.12);
 }
 
 * {
@@ -41,4 +42,108 @@ select {
 ::selection {
   background: #f06472;
   color: white;
+}
+
+.showcase-root {
+  --ink: #101317;
+  --paper: #fbfaf8;
+  --muted: #6b6b76;
+}
+
+.showcase-root h1,
+.showcase-root h2,
+.showcase-root h3 {
+  letter-spacing: 0;
+}
+
+.showcase-band {
+  position: relative;
+  overflow: hidden;
+}
+
+.showcase-band::before {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(16, 19, 23, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 19, 23, 0.045) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, transparent, black 22%, black 78%, transparent);
+}
+
+.showcase-band > * {
+  position: relative;
+}
+
+.showcase-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(16, 19, 23, 0.56);
+}
+
+.showcase-eyebrow::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+.showcase-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #101317;
+  color: white;
+  padding: 0.75rem 1.2rem;
+  font-size: 0.875rem;
+  font-weight: 850;
+  line-height: 1;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+.showcase-button:hover {
+  transform: translateY(-1px);
+  background: #f06472;
+}
+
+.showcase-button-secondary {
+  border: 1px solid rgba(16, 19, 23, 0.15);
+  background: white;
+  color: #101317;
+}
+
+.showcase-button-secondary:hover {
+  border-color: rgba(16, 19, 23, 0.28);
+  background: #101317;
+  color: white;
+}
+
+.showcase-button-light {
+  background: white;
+  color: #101317;
+}
+
+.showcase-button-light:hover {
+  background: #f06472;
+  color: white;
+}
+
+.showcase-button-compact {
+  min-height: 2.35rem;
+  padding: 0.65rem 0.95rem;
+  font-size: 0.8rem;
 }

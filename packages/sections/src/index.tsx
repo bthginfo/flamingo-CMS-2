@@ -82,7 +82,7 @@ function SectionFrame({
   return (
     <section
       className={cn(
-        "px-5 py-16 md:px-8 md:py-24",
+        "showcase-band px-5 py-20 md:px-8 md:py-28",
         background === "ink" && "bg-ink text-white",
         background === "brand" && "bg-flamingo text-white",
         background === "muted" && "bg-white",
@@ -112,28 +112,28 @@ export function HeroSection({
   design?: SectionDesignSettings;
 }) {
   return (
-    <SectionFrame design={design}>
-      <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+    <SectionFrame design={{ ...design, background: "ink", container: "wide" }}>
+      <div className="grid min-h-[74vh] items-end gap-10 py-10 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
-          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-flamingo">
+          <p className="showcase-eyebrow mb-5 text-white/70">
             {data.eyebrow}
           </p>
-          <h1 className="max-w-4xl text-5xl font-black leading-[0.95] md:text-7xl">
+          <h1 className="max-w-5xl text-6xl font-black leading-[0.9] tracking-tight text-white md:text-8xl">
             {data.headline}
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-black/70">
+          <p className="mt-7 max-w-2xl text-xl leading-9 text-white/75">
             {data.description}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
-              className="rounded-full bg-ink px-5 py-3 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5"
+              className="showcase-button showcase-button-light"
               href={data.primaryCta.href}
             >
               {data.primaryCta.label}
             </a>
             {data.secondaryCta ? (
               <a
-                className="rounded-full border border-black/15 px-5 py-3 text-sm font-bold transition hover:bg-white"
+                className="rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-white transition hover:border-white hover:bg-white hover:text-ink"
                 href={data.secondaryCta.href}
               >
                 {data.secondaryCta.label}
@@ -141,18 +141,18 @@ export function HeroSection({
             ) : null}
           </div>
           {data.stats.length > 0 ? (
-            <dl className="mt-10 grid max-w-xl grid-cols-3 gap-4">
+            <dl className="mt-12 grid max-w-2xl grid-cols-3 gap-4 border-t border-white/10 pt-6">
               {data.stats.map((stat) => (
                 <div key={stat.label}>
-                  <dt className="text-2xl font-black">{stat.value}</dt>
-                  <dd className="text-sm text-black/60">{stat.label}</dd>
+                  <dt className="text-3xl font-black text-white">{stat.value}</dt>
+                  <dd className="mt-1 text-sm text-white/60">{stat.label}</dd>
                 </div>
               ))}
             </dl>
           ) : null}
         </div>
-        <div className="min-h-[360px] rounded-[2rem] bg-[radial-gradient(circle_at_20%_10%,#7dd3c7,transparent_30%),linear-gradient(135deg,#101317,#f06472)] p-6 text-white shadow-soft">
-          <div className="flex h-full min-h-[320px] flex-col justify-end rounded-[1.5rem] border border-white/20 p-6">
+        <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3 text-white shadow-soft backdrop-blur">
+          <div className="grid min-h-[420px] content-between rounded-md border border-white/10 bg-black/30 p-5">
             <p className="text-sm uppercase tracking-[0.18em] text-white/70">
               CMS Preview
             </p>
@@ -182,14 +182,14 @@ export function ContentSection({
               {data.eyebrow}
             </p>
           ) : null}
-          <h2 className="text-4xl font-black leading-tight md:text-5xl">{data.headline}</h2>
+          <h2 className="text-5xl font-black leading-[0.98] tracking-tight md:text-6xl">{data.headline}</h2>
         </div>
         <div>
           <p className="text-lg leading-8 text-black/70">{data.body}</p>
           {data.bullets.length > 0 ? (
-            <ul className="mt-6 grid gap-3">
+            <ul className="mt-7 grid gap-3">
               {data.bullets.map((item) => (
-                <li key={item} className="rounded-xl bg-white p-4 shadow-sm">
+                <li key={item} className="rounded-lg border border-black/10 bg-white p-4 font-bold shadow-sm">
                   {item}
                 </li>
               ))}
@@ -212,7 +212,7 @@ export function CtaSection({
     <SectionFrame design={{ background: "ink", container: "default", ...design }}>
       <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
         <div>
-          <h2 className="text-4xl font-black leading-tight text-white md:text-5xl">
+          <h2 className="text-5xl font-black leading-[0.96] tracking-tight text-white md:text-6xl">
             {data.headline}
           </h2>
           <p className="mt-4 max-w-2xl text-lg leading-8 text-white/70">
@@ -221,14 +221,14 @@ export function CtaSection({
         </div>
         <div className="flex flex-wrap gap-3">
           <a
-            className="rounded-full bg-white px-5 py-3 text-sm font-bold text-ink transition hover:-translate-y-0.5"
+            className="showcase-button showcase-button-light"
             href={data.primaryCta.href}
           >
             {data.primaryCta.label}
           </a>
           {data.secondaryCta ? (
             <a
-              className="rounded-full border border-white/30 px-5 py-3 text-sm font-bold text-white"
+              className="rounded-full border border-white/30 px-5 py-3 text-sm font-bold text-white transition hover:bg-white hover:text-ink"
               href={data.secondaryCta.href}
             >
               {data.secondaryCta.label}
@@ -254,12 +254,12 @@ export function FaqSection({
           {data.eyebrow}
         </p>
       ) : null}
-      <h2 className="max-w-3xl text-4xl font-black leading-tight md:text-5xl">
+      <h2 className="max-w-3xl text-5xl font-black leading-[0.98] tracking-tight md:text-6xl">
         {data.headline}
       </h2>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         {data.items.map((item) => (
-          <article key={item.question} className="rounded-2xl bg-white p-6 shadow-sm">
+          <article key={item.question} className="rounded-lg border border-black/10 bg-white p-6 shadow-sm">
             <h3 className="font-black">{item.question}</h3>
             <p className="mt-3 leading-7 text-black/65">{item.answer}</p>
           </article>
@@ -288,18 +288,18 @@ export function CollectionGridSection({
           {data.eyebrow}
         </p>
       ) : null}
-      <h2 className="text-4xl font-black leading-tight md:text-5xl">{data.headline}</h2>
+      <h2 className="max-w-4xl text-5xl font-black leading-[0.98] tracking-tight md:text-6xl">{data.headline}</h2>
       <div className="mt-8 grid gap-5 md:grid-cols-3">
         {items.map((item) => (
           <a
             key={item.id}
-            className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-soft"
+            className="group rounded-lg border border-black/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-black/20 hover:shadow-soft"
             href={item.hasDetailPage ? `/${collection?.key}/${item.slug}` : "#"}
           >
             <p className="text-sm uppercase tracking-[0.14em] text-black/45">
               {collection?.itemLabel}
             </p>
-            <h3 className="mt-3 text-2xl font-black">{item.title}</h3>
+            <h3 className="mt-3 text-2xl font-black group-hover:text-flamingo">{item.title}</h3>
             <p className="mt-3 leading-7 text-black/65">{String(item.data.description ?? "")}</p>
           </a>
         ))}
