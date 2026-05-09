@@ -2,14 +2,17 @@ import { styles, type StyleKey } from "@flamingo/shared";
 import type { TemplatePreviewData } from "./template-preview-data";
 
 const styleCopy: Record<StyleKey, string> = {
-  classic: "Classic setzt auf ruhige Typografie, viel Raum und hochwertige Details.",
-  modern: "Modern arbeitet mit klaren Modulen, scannbaren Flaechen und kompakten CTAs.",
-  bold: "Bold nutzt starke Kontraste, grosse Typografie und mehr visuelle Energie."
+  classic: "Ruhig, hochwertig und mit viel Raum fuer Bilder und Vertrauen.",
+  modern: "Modular, schnell erfassbar und perfekt fuer Besucher mit wenig Zeit.",
+  bold: "Kontrastreich, direkt und gebaut fuer starke erste Eindruecke."
 };
 
 export function TemplatePreviewPage({ data }: { data: TemplatePreviewData }) {
   return (
-    <div style={{ ["--tpl-accent" as string]: data.accent }}>
+    <div
+      className={`template-preview tpl-style-${data.style} tpl-variant-${data.industry}`}
+      style={{ ["--tpl-accent" as string]: data.accent, ["--tpl-dark" as string]: data.dark }}
+    >
       <TemplateNav data={data} />
       <TemplateHero data={data} />
       <TemplateModules data={data} />
@@ -23,9 +26,9 @@ export function TemplatePreviewPage({ data }: { data: TemplatePreviewData }) {
 
 function TemplateNav({ data }: { data: TemplatePreviewData }) {
   return (
-    <div className="sticky top-[93px] z-30 border-b border-black/10 bg-white/90 px-5 py-3 backdrop-blur-xl md:px-8">
+    <div className="sticky top-[93px] z-30 border-b border-black/10 bg-white/88 px-5 py-3 backdrop-blur-xl md:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-        <a className="font-black" href="/beispiele">
+        <a className="text-lg font-black tracking-[-0.03em]" href="/beispiele">
           {data.brand}
         </a>
         <nav className="hidden items-center gap-5 text-sm font-bold text-black/60 md:flex">
@@ -36,7 +39,7 @@ function TemplateNav({ data }: { data: TemplatePreviewData }) {
           ))}
         </nav>
         <a className="showcase-button showcase-button-compact" href="/kontakt">
-          Anfragen
+          {data.nav[1] ?? "Anfragen"}
         </a>
       </div>
     </div>
@@ -45,7 +48,7 @@ function TemplateNav({ data }: { data: TemplatePreviewData }) {
 
 function TemplateHero({ data }: { data: TemplatePreviewData }) {
   return (
-    <section className="relative overflow-hidden bg-[#101317] px-5 py-20 text-white md:px-8 md:py-28">
+    <section className="relative min-h-[82vh] overflow-hidden bg-[#101317] px-5 py-20 text-white md:px-8 md:py-28">
       <div
         aria-hidden
         className="absolute inset-0 bg-cover bg-center opacity-60"
@@ -61,20 +64,20 @@ function TemplateHero({ data }: { data: TemplatePreviewData }) {
           <p className="mt-7 max-w-2xl text-xl leading-9 text-white/75">{data.description}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a className="showcase-button showcase-button-light" href="/kontakt">
-              Projekt anfragen
+              {data.nav[1] ?? "Termin anfragen"}
             </a>
             <a
               className="rounded-full border border-white/30 px-5 py-3 text-sm font-black text-white transition hover:bg-white hover:text-black"
               href="#module"
             >
-              Module ansehen
+              Angebot ansehen
             </a>
           </div>
         </div>
         <div className="rounded-lg border border-white/10 bg-white/[0.08] p-3 backdrop-blur">
           <div className="rounded-md bg-white p-5 text-black">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-black/50">
-              {data.label} / {data.style}
+              Heute verfuegbar
             </p>
             <div className="mt-6 grid grid-cols-3 gap-3">
               {data.metrics.map((metric) => (
@@ -102,14 +105,14 @@ function TemplateModules({ data }: { data: TemplatePreviewData }) {
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-8 md:grid-cols-[0.8fr_1.2fr] md:items-end">
           <div>
-            <p className="showcase-eyebrow">Module</p>
+            <p className="showcase-eyebrow">Angebot</p>
             <h2 className="mt-4 text-5xl font-black leading-[0.96] md:text-6xl">
-              Alles, was diese Branche wirklich braucht.
+              Genau die Inhalte, nach denen Besucher wirklich suchen.
             </h2>
           </div>
           <p className="text-lg leading-8 text-black/60">
-            Die Preview ist kein statisches Mockup. Jedes Modul entspricht einem spaeter
-            editierbaren CMS-Baustein mit sauberem Schema.
+            Preise, Leistungen, Verfuegbarkeit, Team, Lage und Kontaktwege sind nicht Deko. Sie
+            werden als echte CMS-Inhalte gefuehrt und koennen spaeter sauber gepflegt werden.
           </p>
         </div>
         <div className="mt-12 grid gap-4 md:grid-cols-3">
@@ -131,10 +134,14 @@ function TemplateSignature({ data }: { data: TemplatePreviewData }) {
     <section className="px-5 py-20 md:px-8 md:py-28">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr]">
         <div>
-          <p className="showcase-eyebrow">CMS Collection</p>
+          <p className="showcase-eyebrow">{data.nav[0] ?? "Highlights"}</p>
           <h2 className="mt-4 text-5xl font-black leading-[0.96] md:text-6xl">
-            Beispiel-Content als echte Struktur.
+            Ausgewaehlte Highlights.
           </h2>
+          <p className="mt-5 text-lg leading-8 text-black/60">
+            Diese Liste ist exemplarisch, aber nicht abstrakt: genau solche Inhalte liegen spaeter
+            in Collections und koennen im Admin erweitert werden.
+          </p>
         </div>
         <div className="grid gap-3">
           {data.signature.map((item) => (
@@ -165,14 +172,14 @@ function TemplateGallery({ data }: { data: TemplatePreviewData }) {
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <p className="showcase-eyebrow text-white/70">Bildwelt</p>
+            <p className="showcase-eyebrow text-white/70">Atmosphaere</p>
             <h2 className="mt-4 text-5xl font-black leading-[0.96] md:text-6xl">
-              Visuelle Sprache statt Stock-Gefuehl.
+              Eine Bildwelt, die nach echter Marke aussieht.
             </h2>
           </div>
           <p className="max-w-md leading-7 text-white/70">
-            Im echten Projekt ersetzen wir diese Motive durch eigene Bilder, Shooting oder kuratierte
-            Assets.
+            Grosse Bilder, klare Kontraste und passende Schnitte machen aus einer Template-Struktur
+            eine Seite mit eigenem Charakter.
           </p>
         </div>
         <div className="mt-12 grid gap-4 md:grid-cols-3">
@@ -195,7 +202,7 @@ function TemplateProcess({ data }: { data: TemplatePreviewData }) {
   return (
     <section className="px-5 py-20 md:px-8 md:py-28">
       <div className="mx-auto max-w-7xl">
-        <p className="showcase-eyebrow">User Journey</p>
+        <p className="showcase-eyebrow">Besucherweg</p>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {data.process.map((step, index) => (
             <article key={step.title} className="rounded-lg border border-black/10 bg-white p-6 shadow-sm">
@@ -227,7 +234,7 @@ function TemplateCta({ data }: { data: TemplatePreviewData }) {
               {data.label} / {data.style}
             </p>
             <h2 className="mt-4 max-w-3xl text-5xl font-black leading-[0.96] md:text-6xl">
-              Dieses Template als echte CMS-Seite aufbauen.
+              Dieses Look & Feel fuer eine echte Marke starten.
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
