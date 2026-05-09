@@ -1,3 +1,5 @@
+import { MediaUploadForm } from "../../../components/admin/MediaUploadForm";
+
 export default function MediaPage() {
   return (
     <div>
@@ -7,8 +9,9 @@ export default function MediaPage() {
       </p>
       <div className="mt-8 rounded-2xl border border-dashed border-black/20 bg-white p-12 text-center shadow-sm">
         <p className="text-xl font-black">Drag & Drop Upload</p>
-        <p className="mt-2 text-black/55">S3/R2 Storage Adapter wird hier angeschlossen.</p>
+        <p className="mt-2 text-black/55">Uploads laufen über Vercel Blob, sobald `BLOB_READ_WRITE_TOKEN` gesetzt ist.</p>
       </div>
+      <MediaUploadForm />
     </div>
   );
 }

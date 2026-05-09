@@ -313,6 +313,28 @@ export type FormSubmission = {
   createdAt: Date;
 };
 
+export type MediaAsset = {
+  id: string;
+  tenantId: string;
+  folderId?: string;
+  url: string;
+  storageKey: string;
+  filename: string;
+  mimeType: string;
+  type: "image" | "video" | "document" | "svg";
+  alt?: string;
+  caption?: string;
+  width?: number;
+  height?: number;
+  sizeBytes: number;
+  focalPointX?: number;
+  focalPointY?: number;
+  tags: string[];
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export const permissionsByRole: Record<TenantRole, string[]> = {
   super_admin: ["*"],
   agency_admin: [

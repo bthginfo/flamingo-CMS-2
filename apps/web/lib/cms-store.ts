@@ -10,6 +10,7 @@ import {
   type AuthenticatedUser,
   type AuditLog,
   type FormSubmission,
+  type MediaAsset,
   type Page,
   type PageVersion,
   type Section
@@ -21,6 +22,7 @@ import { collections, formDefinitions, pages, sections, showcaseTenant } from ".
 const auditLogs: AuditLog[] = [];
 const pageVersions: PageVersion[] = [];
 const formSubmissions: FormSubmission[] = [];
+const mediaAssets: MediaAsset[] = [];
 
 function id(prefix: string) {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
@@ -371,6 +373,37 @@ export function createPublicFormSubmission(formKey: string, input: unknown) {
     submission,
     successMessage: form.successMessage
   };
+}
+
+export function listMediaAssets(user: AuthenticatedUser) {
+  requirePermission(user, "media:upload");
+  return mediaAssets.filter((asset) => asset.tenantId === user.tenantId);
+}
+
+export function createMediaAsset(
+  user: AuthenticatedUser,
+  input: Omit<MediaAsset, "id" | "tenantId" | "createdBy" | "createdAt" | "updatedAt">
+) {
+  requirePermission(user, "media:upload");
+
+  const asset: MediaAsset = {
+    id: id("media"),
+    tenantId: user.tenantId,
+    createdBy: user.id,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...input
+  };
+
+  mediaAssets.push(asset);
+  audit(user, {
+    action: "media_upload",
+    entityType: "media_asset",
+    entityId: asset.id,
+    after: asset
+  });
+
+  return asset;
 }
 
 function fail(message: string): never {
