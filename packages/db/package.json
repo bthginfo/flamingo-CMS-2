@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
+    "./form-repository": "./src/form-repository.ts",
     "./site-repository": "./src/site-repository.ts"
   },
   "dependencies": {

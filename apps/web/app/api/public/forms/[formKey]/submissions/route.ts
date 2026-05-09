@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createPublicFormSubmission } from "../../../../../../lib/cms-store";
+import { createPublicFormSubmission } from "../../../../../../lib/public-form-submissions";
 
 export async function POST(
   request: Request,
@@ -10,7 +10,7 @@ export async function POST(
     const payload = contentType.includes("application/json")
       ? await request.json()
       : await formDataPayload(request);
-    const result = createPublicFormSubmission(params.formKey, payload);
+    const result = await createPublicFormSubmission(params.formKey, payload);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return NextResponse.json(
