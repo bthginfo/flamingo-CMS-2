@@ -16,12 +16,190 @@ export function TemplatePreviewPage({ data }: { data: TemplatePreviewData }) {
       <TemplateNav data={data} />
       <TemplateHero data={data} />
       <TemplateLivePanel data={data} />
+      <TemplateIndustrySignature data={data} />
       <TemplateModules data={data} />
       <TemplateSignature data={data} />
       <TemplateGallery data={data} />
       <TemplateProcess data={data} />
       <TemplateCta data={data} />
     </div>
+  );
+}
+
+const industrySignatureData: Record<
+  TemplatePreviewData["industry"],
+  {
+    title: string;
+    eyebrow: string;
+    lead: string;
+    primary: Array<{ label: string; value: string; meta: string }>;
+    secondary: string[];
+    image: string;
+  }
+> = {
+  restaurant: {
+    eyebrow: "Menu Experience",
+    title: "Speisekarte, Stimmung und Reservierung greifen ineinander.",
+    lead: "Gerichte, Drinks, Oeffnungszeiten und Events werden nicht versteckt. Die Seite fuehrt direkt vom Appetit zur Buchung.",
+    primary: [
+      { label: "Antipasti", value: "Burrata & Pfirsich", meta: "14" },
+      { label: "Pasta", value: "Truffle Tagliolini", meta: "24" },
+      { label: "Dolce", value: "Amalfi Lemon Tart", meta: "11" }
+    ],
+    secondary: ["Heute: 18:00 - 23:00", "Terrasse offen", "Private Dining bis 18 Personen"],
+    image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1300&q=85"
+  },
+  hotel: {
+    eyebrow: "Booking Story",
+    title: "Zimmer, Angebote und Erlebnis werden zur Direktbuchung.",
+    lead: "Der Gast sieht nicht nur Ausstattung, sondern einen Aufenthalt: Zimmervergleich, Spa, Lage und Pakete mit klaren Anfragewegen.",
+    primary: [
+      { label: "Suite", value: "Panorama Suite", meta: "ab 219" },
+      { label: "Offer", value: "Wellness Weekend", meta: "2 Naechte" },
+      { label: "Extra", value: "Late Checkout", meta: "inklusive" }
+    ],
+    secondary: ["Keine Portalprovision", "Spa-Zugang sichtbar", "Angebote saisonal pflegbar"],
+    image: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1300&q=85"
+  },
+  tourism: {
+    eyebrow: "Tour Planner",
+    title: "Touren fuehlen sich schon vor der Anfrage buchbar an.",
+    lead: "Level, Dauer, Treffpunkt, Guides und Saison werden als echte Entscheidungsdaten sichtbar.",
+    primary: [
+      { label: "Hike", value: "Sunrise Ridge", meta: "4h" },
+      { label: "Guide", value: "Mara / EN DE", meta: "frei" },
+      { label: "Level", value: "Mittel", meta: "ab 79" }
+    ],
+    secondary: ["Treffpunkt im Hero", "Guide-Profile", "Saisonale Verfuegbarkeit"],
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1300&q=85"
+  },
+  salon: {
+    eyebrow: "Lookbook Booking",
+    title: "Treatments, Looks und Artist-Profil machen den Termin greifbar.",
+    lead: "Beauty-Seiten brauchen mehr als eine Preisliste: Lookbook, Dauer, Preis, Team und Buchung muessen direkt zusammenspielen.",
+    primary: [
+      { label: "Color", value: "Balayage Refresh", meta: "120 min" },
+      { label: "Cut", value: "Signature Cut", meta: "ab 69" },
+      { label: "Care", value: "Glow Facial", meta: "ab 89" }
+    ],
+    secondary: ["Artist-Auswahl", "Vorher/Nachher Galerie", "Online-Termin prominent"],
+    image: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=1300&q=85"
+  },
+  trades: {
+    eyebrow: "Lead Funnel",
+    title: "Handwerk braucht Vertrauen, Referenzen und schnelle Anfragen.",
+    lead: "Leistungsseiten, Referenz-Cases, Dringlichkeit und Anfrageformular qualifizieren Kontakte, bevor das Telefon klingelt.",
+    primary: [
+      { label: "Case", value: "Bad Sanierung", meta: "14 Tage" },
+      { label: "Service", value: "Wartung", meta: "Fixpreis" },
+      { label: "Lead", value: "Energie Upgrade", meta: "Foerdercheck" }
+    ],
+    secondary: ["Notdienst-CTA", "Regionale SEO-Seiten", "Referenzen mit Ergebnis"],
+    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1300&q=85"
+  },
+  consulting: {
+    eyebrow: "B2B Clarity",
+    title: "Expertise wird als Entscheidungsstrecke inszeniert.",
+    lead: "Cases, Methoden, Branchen und Teamprofile werden so aufgebaut, dass Entscheider schnell Vertrauen und Relevanz erkennen.",
+    primary: [
+      { label: "Sprint", value: "Go-to-Market", meta: "2 Wochen" },
+      { label: "Audit", value: "Operations", meta: "Roadmap" },
+      { label: "Call", value: "30m Scope", meta: "kostenlos" }
+    ],
+    secondary: ["Case-Study Struktur", "Team mit Schwerpunkten", "Briefing vor dem Call"],
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1300&q=85"
+  },
+  medical: {
+    eyebrow: "Patient Flow",
+    title: "Praxis-Websites muessen beruhigen und sofort orientieren.",
+    lead: "Leistungen, Sprechzeiten, Team, Notfall-Hinweise und Online-Termin sind barrierearm sortiert.",
+    primary: [
+      { label: "Termin", value: "Erstgespraech", meta: "online" },
+      { label: "Info", value: "Sprechzeiten", meta: "2 Standorte" },
+      { label: "Team", value: "4 Behandler", meta: "Profile" }
+    ],
+    secondary: ["Notfall-Hinweise", "Leistungsuebersicht", "Unterlagen vorab"],
+    image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1300&q=85"
+  },
+  fitness: {
+    eyebrow: "Class Energy",
+    title: "Kursplan, Programme und Trial-CTA pushen den Einstieg.",
+    lead: "Fitness braucht Rhythmus: Kurse, Coaches, Level, Preis und Probetraining muessen in Sekunden scanbar sein.",
+    primary: [
+      { label: "Heute", value: "Strength Lab", meta: "18:00" },
+      { label: "Coach", value: "Nina", meta: "Mobility" },
+      { label: "Trial", value: "Intro Session", meta: "0 EUR" }
+    ],
+    secondary: ["Wochenplan", "Coach-Karten", "Probetraining Funnel"],
+    image: "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?auto=format&fit=crop&w=1300&q=85"
+  },
+  "real-estate": {
+    eyebrow: "Property Funnel",
+    title: "Objekte, Regionen und Bewertung arbeiten zusammen.",
+    lead: "Makler-Seiten brauchen Objektlogik, Eigentümer-Funnel und lokale Kompetenz auf einer klaren Oberfläche.",
+    primary: [
+      { label: "Neu", value: "Penthouse West", meta: "124 qm" },
+      { label: "Region", value: "Innenstadt", meta: "Guide" },
+      { label: "Lead", value: "Bewertung", meta: "48h" }
+    ],
+    secondary: ["Objektstatus", "Expose Anfrage", "Verkaufsbewertung"],
+    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1300&q=85"
+  }
+};
+
+function TemplateIndustrySignature({ data }: { data: TemplatePreviewData }) {
+  const signature = industrySignatureData[data.industry];
+
+  return (
+    <section className="px-5 py-20 md:px-8 md:py-28">
+      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.72fr_1.28fr]">
+        <div className="grid content-between rounded-lg border border-black/10 bg-white p-6 shadow-sm">
+          <div>
+            <p className="showcase-eyebrow">{signature.eyebrow}</p>
+            <h2 className="mt-4 text-5xl font-black leading-[0.94] md:text-6xl">{signature.title}</h2>
+            <p className="mt-6 text-lg leading-8 text-black/60">{signature.lead}</p>
+          </div>
+          <div className="mt-10 flex flex-wrap gap-2">
+            {signature.secondary.map((item) => (
+              <span key={item} className="rounded-full border border-black/10 bg-paper px-3 py-1 text-xs font-black text-black/60">
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="grid overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm lg:grid-cols-[1fr_0.92fr]">
+          <div
+            className="min-h-[420px] bg-cover bg-center"
+            style={{
+              backgroundImage: `linear-gradient(to top, rgba(0,0,0,.55), transparent 55%), url(${signature.image})`
+            }}
+          />
+          <div className="grid content-between gap-5 p-5">
+            <div className="grid gap-3">
+              {signature.primary.map((item) => (
+                <article key={item.value} className="rounded-md border border-black/10 bg-paper p-4">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-black/40">{item.label}</p>
+                  <div className="mt-3 flex items-end justify-between gap-4">
+                    <h3 className="text-2xl font-black leading-none">{item.value}</h3>
+                    <span className="rounded-full px-3 py-1 text-xs font-black text-white" style={{ background: data.dark }}>
+                      {item.meta}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="rounded-md p-5 text-white" style={{ background: data.dark }}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">
+                {data.label} / {data.style}
+              </p>
+              <p className="mt-3 text-3xl font-black leading-none">
+                Branchenlogik statt austauschbarem Template.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 

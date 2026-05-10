@@ -337,6 +337,39 @@ select {
   transform: rotate(45deg);
 }
 
+.template-preview.tpl-style-classic article,
+.template-preview.tpl-style-classic figure {
+  box-shadow: 0 18px 60px rgba(16, 19, 23, 0.08);
+}
+
+.template-preview.tpl-style-classic section {
+  background-size: 56px 56px;
+}
+
+.template-preview.tpl-style-modern article,
+.template-preview.tpl-style-modern figure {
+  box-shadow: none;
+}
+
+.template-preview.tpl-style-modern section {
+  background-image:
+    linear-gradient(rgba(16, 19, 23, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 19, 23, 0.035) 1px, transparent 1px),
+    linear-gradient(120deg, transparent 0%, transparent 72%, var(--tpl-noise, transparent) 100%);
+  background-size: 34px 34px, 34px 34px, auto;
+}
+
+.template-preview.tpl-style-bold section {
+  background-image:
+    linear-gradient(135deg, rgba(0, 0, 0, 0.035) 25%, transparent 25%),
+    linear-gradient(120deg, transparent 0%, transparent 72%, var(--tpl-noise, transparent) 100%);
+  background-size: 18px 18px, auto;
+}
+
+.template-preview.tpl-style-bold article {
+  border-width: 2px;
+}
+
 .tpl-variant-restaurant {
   --tpl-noise: rgba(240, 100, 114, 0.1);
 }
