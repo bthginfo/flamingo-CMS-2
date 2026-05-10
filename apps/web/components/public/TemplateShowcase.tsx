@@ -1,4 +1,5 @@
 import { industries, styles, type IndustryKey, type StyleKey } from "@flamingo/shared";
+import { Marquee, Reveal } from "./ShowcaseFx";
 
 type IndustryMeta = {
   key: IndustryKey;
@@ -104,21 +105,23 @@ const cards = industries.map((key) => ({ key, ...industryMeta[key] }));
 
 export function TemplateShowcase({ compact = false }: { compact?: boolean }) {
   const visibleCards = compact ? cards.slice(0, 6) : cards;
+  const featured = visibleCards[0];
+  const rest = compact ? visibleCards.slice(1) : visibleCards;
 
   return (
     <section className="showcase-band bg-ink px-5 py-20 text-white md:px-8 md:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-end">
+        <Reveal className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-end">
           <div>
             <p className="showcase-eyebrow text-white/70">Templates</p>
             <h2 className="mt-4 max-w-3xl text-5xl font-black leading-[0.95] tracking-tight md:text-7xl">
-              Branchen-Templates mit eigenem Charakter.
+              Branchen-Templates, die nach echten Marken aussehen.
             </h2>
           </div>
           <div className="grid gap-4 text-white/70">
             <p className="text-lg leading-8">
-              Jede Branche hat eigene Module, eigene Bildsprache und drei Stilrichtungen. Die
-              gleiche CMS-Struktur treibt Vorschau, Admin und Live-Seite.
+              Jede Branche bekommt eigene Dramaturgie, Bildwelt und Conversion-Strecke. Classic,
+              Modern und Bold sind keine Farbfilter, sondern unterschiedliche Auftritte.
             </p>
             <div className="flex flex-wrap gap-2">
               {styles.map((style) => (
@@ -131,62 +134,105 @@ export function TemplateShowcase({ compact = false }: { compact?: boolean }) {
               ))}
             </div>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {visibleCards.map((item, index) => (
+        {compact && featured ? (
+          <Reveal className="mt-12">
             <a
-              key={item.key}
-              id={item.key}
-              href={`/templates/${item.key}/classic`}
-              className="group relative min-h-[420px] overflow-hidden rounded-lg border border-white/10 bg-white/5 transition duration-500 hover:-translate-y-1 hover:border-white/25"
+              href={`/templates/${featured.key}/modern`}
+              className="group grid min-h-[560px] overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] lg:grid-cols-[0.85fr_1.15fr]"
             >
-              <div
-                aria-hidden
-                className="absolute inset-0 bg-cover bg-center opacity-70 transition duration-700 group-hover:scale-105 group-hover:opacity-80"
-                style={{ backgroundImage: `url(${item.image})` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10" />
-              <div className="relative flex h-full min-h-[420px] flex-col justify-between p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <span className="font-mono text-xs uppercase tracking-[0.22em] text-white/60">
-                    / {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: item.accent }}
-                    aria-hidden
-                  />
+              <div className="grid content-between p-7 md:p-10">
+                <div className="flex items-center justify-between">
+                  <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/45">
+                    Featured Template
+                  </p>
+                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: featured.accent }} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">
-                    {item.tagline}
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-white/55">
+                    {featured.tagline}
                   </p>
-                  <h3 className="mt-3 text-4xl font-black tracking-tight">{item.label}</h3>
-                  <p className="mt-4 max-w-sm leading-7 text-white/75">{item.description}</p>
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {item.modules.map((module) => (
-                      <span
-                        key={module}
-                        className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/80"
-                      >
+                  <h3 className="mt-4 text-6xl font-black leading-[0.9] md:text-8xl">
+                    {featured.label}
+                  </h3>
+                  <p className="mt-5 max-w-md text-lg leading-8 text-white/70">{featured.description}</p>
+                  <div className="mt-8 flex flex-wrap gap-2">
+                    {featured.modules.map((module) => (
+                      <span key={module} className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">
                         {module}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {styles.map((style) => (
-                      <span
-                        key={style}
-                        className="rounded-full border border-white/15 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-white/75"
-                      >
-                        {styleLabels[style]}
                       </span>
                     ))}
                   </div>
                 </div>
               </div>
+              <div
+                className="min-h-[420px] bg-cover bg-center transition duration-700 group-hover:scale-[1.025]"
+                style={{
+                  backgroundImage: `linear-gradient(to top, rgba(0,0,0,.35), transparent), url(${featured.image})`
+                }}
+              />
             </a>
+          </Reveal>
+        ) : null}
+
+        <div className="mt-8 overflow-hidden border-y border-white/10 py-4">
+          <Marquee
+            items={["Classic", "Modern", "Bold", "CMS-driven", "Mobile-first", "Admin-ready", "Blob Media"]}
+            speed={38}
+            className="text-white/60"
+          />
+        </div>
+
+        <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {rest.map((item, index) => (
+            <Reveal key={item.key} delay={(index % 3) * 0.04}>
+              <article
+                id={item.key}
+                className="group relative min-h-[455px] overflow-hidden rounded-lg border border-white/10 bg-white/5 transition duration-500 hover:-translate-y-1 hover:border-white/25"
+              >
+                <a href={`/templates/${item.key}/classic`} className="absolute inset-0" aria-label={`${item.label} Template ansehen`} />
+                <div
+                  aria-hidden
+                  className="absolute inset-0 bg-cover bg-center opacity-70 transition duration-700 group-hover:scale-105 group-hover:opacity-85"
+                  style={{ backgroundImage: `url(${item.image})` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10" />
+                <div className="relative flex h-full min-h-[455px] flex-col justify-between p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="font-mono text-xs uppercase tracking-[0.22em] text-white/60">
+                      / {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: item.accent }} aria-hidden />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">
+                      {item.tagline}
+                    </p>
+                    <h3 className="mt-3 text-4xl font-black tracking-tight">{item.label}</h3>
+                    <p className="mt-4 max-w-sm leading-7 text-white/75">{item.description}</p>
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {item.modules.map((module) => (
+                        <span key={module} className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/80">
+                          {module}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="relative z-10 mt-5 flex flex-wrap gap-2">
+                      {styles.map((style) => (
+                        <a
+                          key={style}
+                          className="rounded-full border border-white/15 bg-black/20 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-white/75 backdrop-blur transition hover:border-white hover:bg-white hover:text-black"
+                          href={`/templates/${item.key}/${style}`}
+                        >
+                          {styleLabels[style]}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </Reveal>
           ))}
         </div>
 
@@ -203,7 +249,7 @@ export function TemplateShowcase({ compact = false }: { compact?: boolean }) {
 }
 
 export function AdminDemoShowcase() {
-  const sections = ["Hero", "Angebote", "Galerie", "FAQ", "CTA"];
+  const sections = ["Rich Hero", "Service Bento", "Gallery Mosaic", "Pricing Cards", "Lead Form"];
 
   return (
     <section className="showcase-band bg-paper px-5 py-20 md:px-8 md:py-28">
@@ -227,8 +273,8 @@ export function AdminDemoShowcase() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-black/10 bg-white p-3 shadow-soft">
-          <div className="rounded-md border border-black/10 bg-[#101317] p-4 text-white">
+        <Reveal className="rounded-lg border border-black/10 bg-white p-3 shadow-soft">
+          <div className="rounded-md border border-black/10 bg-[#09090c] p-4 text-white">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
                 <p className="font-mono text-xs uppercase tracking-[0.18em] text-white/50">
@@ -240,20 +286,36 @@ export function AdminDemoShowcase() {
                 Live
               </span>
             </div>
-            <div className="grid gap-4 pt-4 md:grid-cols-[220px_1fr]">
-              <aside className="grid gap-2">
-                {["Pages", "Sections", "Media", "Design", "SEO"].map((item, index) => (
+            <div className="grid gap-4 pt-4 md:grid-cols-[210px_1fr]">
+              <aside className="grid content-start gap-2">
+                {["Dashboard", "Pages", "Sections", "Media", "Design", "SEO"].map((item, index) => (
                   <div
                     key={item}
                     className={`rounded-md px-3 py-2 text-sm ${
-                      index === 1 ? "bg-white text-black" : "bg-white/5 text-white/70"
+                      index === 2 ? "bg-white text-black" : "bg-white/5 text-white/70"
                     }`}
                   >
                     {item}
                   </div>
                 ))}
+                <div className="mt-4 rounded-md bg-flamingo p-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-white/70">Heute</p>
+                  <p className="mt-2 text-3xl font-black">12 Leads</p>
+                </div>
               </aside>
               <div className="grid gap-3">
+                <div className="grid gap-3 md:grid-cols-3">
+                  {[
+                    ["57", "Routen"],
+                    ["12", "Sections"],
+                    ["100%", "validiert"]
+                  ].map(([value, label]) => (
+                    <div key={label} className="rounded-md border border-white/10 bg-white/[0.06] p-3">
+                      <p className="text-2xl font-black">{value}</p>
+                      <p className="text-xs uppercase tracking-[0.16em] text-white/40">{label}</p>
+                    </div>
+                  ))}
+                </div>
                 {sections.map((section, index) => (
                   <div
                     key={section}
@@ -264,19 +326,23 @@ export function AdminDemoShowcase() {
                     </span>
                     <div>
                       <p className="font-bold">{section}</p>
-                      <p className="text-xs text-white/50">Validiert, sortierbar, publish-ready</p>
+                      <p className="text-xs text-white/50">Fields, Design, Animation und Preview verbunden</p>
                     </div>
-                    <span className="text-xs font-bold text-white/50">Edit</span>
+                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-bold text-white/50">
+                      Edit
+                    </span>
                   </div>
                 ))}
-                <div className="rounded-md bg-flamingo p-4 text-white">
-                  <p className="text-xs uppercase tracking-[0.18em] text-white/70">Preview</p>
-                  <p className="mt-2 text-2xl font-black">Aenderungen sind sofort sichtbar.</p>
+                <div className="grid min-h-[180px] content-end rounded-md bg-[url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center p-4 text-white">
+                  <p className="text-xs uppercase tracking-[0.18em] text-white/70">Live Preview</p>
+                  <p className="mt-2 max-w-md text-3xl font-black leading-none">
+                    Aenderungen sind sofort als echte Kundenseite sichtbar.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -15,12 +15,115 @@ export function TemplatePreviewPage({ data }: { data: TemplatePreviewData }) {
     >
       <TemplateNav data={data} />
       <TemplateHero data={data} />
+      <TemplateLivePanel data={data} />
       <TemplateModules data={data} />
       <TemplateSignature data={data} />
       <TemplateGallery data={data} />
       <TemplateProcess data={data} />
       <TemplateCta data={data} />
     </div>
+  );
+}
+
+const industryPanelCopy: Record<
+  TemplatePreviewData["industry"],
+  { title: string; kicker: string; left: string; right: string; cta: string }
+> = {
+  restaurant: {
+    title: "Heute Abend noch freie Tische.",
+    kicker: "Reservierung",
+    left: "2 Personen · 19:30 Uhr · Terrasse",
+    right: "Wochenkarte: Trueffel, Amalfi, Naturwein",
+    cta: "Tisch sichern"
+  },
+  hotel: {
+    title: "Direkt buchen statt Provision zahlen.",
+    kicker: "Aufenthalt",
+    left: "2 Naechte · Panorama Suite · Spa inklusive",
+    right: "Sommerangebot mit Dinner und Late Checkout",
+    cta: "Zimmer anfragen"
+  },
+  tourism: {
+    title: "Tour auswaehlen, Guide kennenlernen, Termin sichern.",
+    kicker: "Erlebnis",
+    left: "Sunrise Ridge · mittel · 4 Stunden",
+    right: "Treffpunkt, Level und freie Termine direkt sichtbar",
+    cta: "Tour buchen"
+  },
+  salon: {
+    title: "Look finden und Termin ohne Umwege buchen.",
+    kicker: "Booking",
+    left: "Balayage Refresh · 120 Minuten · Studio Bloom",
+    right: "Preise, Dauer und Artist-Profil sind sofort klar",
+    cta: "Termin buchen"
+  },
+  trades: {
+    title: "Aus Interesse wird eine qualifizierte Anfrage.",
+    kicker: "Leadflow",
+    left: "Bad Sanierung · Innsbruck · Budget vorhanden",
+    right: "Referenzen, Notdienst und Prozess senken Rueckfragen",
+    cta: "Anfrage starten"
+  },
+  consulting: {
+    title: "B2B-Kompetenz ohne Buzzword-Fassade.",
+    kicker: "Erstgespraech",
+    left: "30 Minuten · Scope Check · klare naechste Schritte",
+    right: "Cases, Methoden und Team zeigen Substanz",
+    cta: "Termin buchen"
+  },
+  medical: {
+    title: "Patientinnen finden schnell den richtigen Weg.",
+    kicker: "Praxis",
+    left: "Sprechzeiten · Leistungen · Online-Termin",
+    right: "Ruhige Navigation und klare Hinweise reduzieren Stress",
+    cta: "Termin vereinbaren"
+  },
+  fitness: {
+    title: "Kursplan, Coaches und Probetraining mit Energie.",
+    kicker: "Trial",
+    left: "Strength Lab · Donnerstag · 18:00 Uhr",
+    right: "Level, Coach und Einstieg sind sofort sichtbar",
+    cta: "Probetraining"
+  },
+  "real-estate": {
+    title: "Objekte und Bewertung in einem starken Funnel.",
+    kicker: "Immobilien",
+    left: "Penthouse West · 124 qm · Dachterrasse",
+    right: "Expose, Region und Bewertungs-CTA arbeiten zusammen",
+    cta: "Expose anfragen"
+  }
+};
+
+function TemplateLivePanel({ data }: { data: TemplatePreviewData }) {
+  const copy = industryPanelCopy[data.industry];
+
+  return (
+    <section className="px-5 py-16 md:px-8 md:py-20" style={{ background: data.surface }}>
+      <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="rounded-lg border border-black/10 bg-white p-6 shadow-sm">
+          <p className="showcase-eyebrow">{copy.kicker}</p>
+          <h2 className="mt-4 text-5xl font-black leading-[0.94] md:text-6xl">{copy.title}</h2>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-black/60">
+            Das ist der Unterschied zwischen “Template anschauen” und “echte Website erleben”:
+            Besucher sehen sofort die naechste sinnvolle Aktion.
+          </p>
+        </div>
+        <div className="grid gap-4 rounded-lg p-4 text-white" style={{ background: data.dark }}>
+          <div className="rounded-md border border-white/10 bg-white/[0.07] p-5">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">Auswahl</p>
+            <p className="mt-3 text-3xl font-black">{copy.left}</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+            <p className="rounded-md border border-white/10 bg-white/[0.07] p-5 leading-7 text-white/72">
+              {copy.right}
+            </p>
+            <a className="showcase-button showcase-button-light whitespace-nowrap" href="/kontakt">
+              {copy.cta}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
