@@ -22,10 +22,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f5f2] text-ink">
-      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-black/10 bg-white p-5 md:block">
-        <a className="text-xl font-black" href="/admin">
-          Flamingo CMS
+    <div className="min-h-screen bg-[#f4f2ee] text-ink">
+      <aside className="fixed inset-y-0 left-0 hidden w-[19rem] border-r border-white/10 bg-[#09090c] p-4 text-white md:block">
+        <a className="flex items-center gap-3 rounded-lg bg-white/[0.06] p-3" href="/admin">
+          <span className="grid h-10 w-10 place-items-center rounded-md bg-flamingo text-sm font-black">F</span>
+          <span>
+            <span className="block text-lg font-black leading-none">Flamingo CMS</span>
+            <span className="mt-1 block text-xs font-bold uppercase tracking-[0.16em] text-white/35">Workspace</span>
+          </span>
         </a>
         <nav className="mt-8 grid gap-1">
           {nav.map((item) => {
@@ -33,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             return (
               <a
                 key={item.href}
-                className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-black/65 transition hover:bg-black/5 hover:text-black"
+                className="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-bold text-white/58 transition hover:bg-white/10 hover:text-white"
                 href={item.href}
               >
                 <Icon size={18} />
@@ -42,9 +46,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
         </nav>
+        <div className="absolute inset-x-4 bottom-4 rounded-lg border border-white/10 bg-white/[0.06] p-4">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-white/35">Production</p>
+          <p className="mt-2 text-2xl font-black">57 Routen</p>
+          <p className="mt-2 text-sm leading-6 text-white/50">Templates, Admin und Public Pages laufen aus demselben CMS-Kern.</p>
+        </div>
       </aside>
-      <div className="md:pl-72">
-        <header className="sticky top-0 z-30 border-b border-black/10 bg-white/90 px-5 py-4 backdrop-blur">
+      <div className="md:pl-[19rem]">
+        <header className="sticky top-0 z-30 border-b border-black/10 bg-[#fbfaf8]/90 px-5 py-4 backdrop-blur">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-black/40">
@@ -56,11 +65,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </p>
             </div>
             <div className="flex gap-2">
-              <a className="rounded-full border border-black/10 px-4 py-2 text-sm font-bold" href="/">
+              <a className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-bold" href="/">
                 Website ansehen
               </a>
               <LogoutButton />
-              <button className="rounded-full bg-ink px-4 py-2 text-sm font-bold text-white">
+              <button className="rounded-full bg-ink px-4 py-2 text-sm font-black text-white">
                 Publish
               </button>
             </div>
