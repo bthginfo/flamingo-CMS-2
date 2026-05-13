@@ -361,6 +361,16 @@ export type MediaAsset = {
   updatedAt: Date;
 };
 
+export type MediaUsage = {
+  id: string;
+  entityType: "page" | "section" | "collection_item";
+  entityId: string;
+  label: string;
+  location: string;
+  fieldPath: string;
+  href?: string;
+};
+
 export const permissionsByRole: Record<TenantRole, string[]> = {
   super_admin: ["*"],
   agency_admin: [

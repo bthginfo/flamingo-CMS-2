@@ -14,6 +14,7 @@ import {
   type CollectionItem,
   type FormSubmission,
   type MediaAsset,
+  type MediaUsage,
   type Page,
   type PageVersion,
   type Section
@@ -652,6 +653,63 @@ export function listMediaAssets(user: AuthenticatedUser) {
   return mediaAssets.filter((asset) => asset.tenantId === user.tenantId);
 }
 
+export function listMediaAssetUsages(user: AuthenticatedUser, assetId: string): MediaUsage[] {
+  requirePermission(user, "media:upload");
+  const asset = assertTenantScope(
+    mediaAssets.find((candidate) => candidate.id === assetId) ?? fail("Media asset not found"),
+    user.tenantId
+  );
+  const needles = new Set([asset.id, asset.url, asset.storageKey, asset.filename].filter(Boolean));
+  const usages: MediaUsage[] = [];
+
+  for (const page of pages.filter((candidate) => candidate.tenantId === user.tenantId)) {
+    collectMediaMatches(page.seo, needles, `page:${page.id}:seo`, (fieldPath) => {
+      usages.push({
+        id: `page_${page.id}_${fieldPath}`,
+        entityType: "page",
+        entityId: page.id,
+        label: page.title,
+        location: "Page SEO",
+        fieldPath,
+        href: `/admin/pages/${page.id}`
+      });
+    });
+  }
+
+  for (const section of sections.filter((candidate) => candidate.tenantId === user.tenantId)) {
+    const page = pages.find((candidate) => candidate.id === section.pageId);
+    collectMediaMatches(section.data, needles, `section:${section.id}:data`, (fieldPath) => {
+      usages.push({
+        id: `section_${section.id}_${fieldPath}`,
+        entityType: "section",
+        entityId: section.id,
+        label: section.label ?? section.type,
+        location: page ? `${page.title} / ${section.label ?? section.type}` : section.label ?? section.type,
+        fieldPath,
+        href: page ? `/admin/pages/${page.id}#${section.id}` : undefined
+      });
+    });
+  }
+
+  for (const collection of collections.filter((candidate) => candidate.tenantId === user.tenantId)) {
+    for (const item of collection.items) {
+      collectMediaMatches({ data: item.data, seo: item.seo }, needles, `collection:${collection.key}:${item.id}`, (fieldPath) => {
+        usages.push({
+          id: `collection_${item.id}_${fieldPath}`,
+          entityType: "collection_item",
+          entityId: item.id,
+          label: item.title,
+          location: `${collection.label} / ${item.title}`,
+          fieldPath,
+          href: `/admin/collections/${collection.key}`
+        });
+      });
+    }
+  }
+
+  return usages;
+}
+
 export function createMediaAsset(
   user: AuthenticatedUser,
   input: Omit<MediaAsset, "id" | "tenantId" | "createdBy" | "createdAt" | "updatedAt">
@@ -676,6 +734,31 @@ export function createMediaAsset(
   });
 
   return asset;
+}
+
+function collectMediaMatches(
+  value: unknown,
+  needles: Set<string>,
+  path: string,
+  onMatch: (fieldPath: string) => void
+) {
+  if (typeof value === "string") {
+    if (needles.has(value) || Array.from(needles).some((needle) => needle && value.includes(needle))) {
+      onMatch(path);
+    }
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => collectMediaMatches(item, needles, `${path}.${index}`, onMatch));
+    return;
+  }
+
+  if (typeof value === "object" && value !== null) {
+    for (const [key, nested] of Object.entries(value)) {
+      collectMediaMatches(nested, needles, `${path}.${key}`, onMatch);
+    }
+  }
 }
 
 export function updateMediaAsset(

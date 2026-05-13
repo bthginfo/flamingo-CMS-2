@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { MediaAsset } from "@flamingo/cms-core";
+import type { MediaAsset, MediaUsage } from "@flamingo/cms-core";
 import { adminFetch } from "./api-client";
 
 export function MediaLibraryClient({ initialAssets = [] }: { initialAssets?: MediaAsset[] }) {
@@ -11,6 +11,8 @@ export function MediaLibraryClient({ initialAssets = [] }: { initialAssets?: Med
   const [caption, setCaption] = useState(selected?.caption ?? "");
   const [focalPointX, setFocalPointX] = useState(selected?.focalPointX ?? 50);
   const [focalPointY, setFocalPointY] = useState(selected?.focalPointY ?? 50);
+  const [tags, setTags] = useState(selected?.tags.join(", ") ?? "");
+  const [usages, setUsages] = useState<MediaUsage[]>([]);
   const [message, setMessage] = useState<string | null>(null);
 
   async function loadAssets() {
@@ -33,7 +35,22 @@ export function MediaLibraryClient({ initialAssets = [] }: { initialAssets?: Med
     setCaption(selected?.caption ?? "");
     setFocalPointX(selected?.focalPointX ?? 50);
     setFocalPointY(selected?.focalPointY ?? 50);
+    setTags(selected?.tags.join(", ") ?? "");
+    setUsages([]);
+    if (selected) {
+      void loadUsages(selected.id);
+    }
   }, [selected]);
+
+  async function loadUsages(assetId: string) {
+    const response = await adminFetch(`/api/admin/media/${assetId}/usage`);
+    if (!response.ok) {
+      setMessage("Usage Finder konnte nicht geladen werden.");
+      return;
+    }
+    const result = (await response.json()) as { usages: MediaUsage[] };
+    setUsages(result.usages);
+  }
 
   async function saveSelected() {
     if (!selected) {
@@ -43,7 +60,13 @@ export function MediaLibraryClient({ initialAssets = [] }: { initialAssets?: Med
     const response = await adminFetch(`/api/admin/media/${selected.id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ alt, caption, focalPointX, focalPointY })
+      body: JSON.stringify({
+        alt,
+        caption,
+        focalPointX,
+        focalPointY,
+        tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean)
+      })
     });
 
     if (!response.ok) {
@@ -97,6 +120,11 @@ export function MediaLibraryClient({ initialAssets = [] }: { initialAssets?: Med
         {selected ? (
           <div className="mt-4 grid gap-4">
             <p className="font-black">{selected.filename}</p>
+            <div className="rounded-xl bg-paper p-3 text-xs font-bold leading-5 text-black/55">
+              <p>{selected.mimeType}</p>
+              <p>{Math.round(selected.sizeBytes / 1024)} KB</p>
+              <p className="break-all">{selected.storageKey}</p>
+            </div>
             <label className="grid gap-2 text-sm font-bold">
               Alt Text
               <input className="rounded-xl border border-black/10 p-3" value={alt} onChange={(event) => setAlt(event.target.value)} />
@@ -113,9 +141,44 @@ export function MediaLibraryClient({ initialAssets = [] }: { initialAssets?: Med
               Focal Point Y
               <input type="range" min="0" max="100" value={focalPointY} onChange={(event) => setFocalPointY(Number(event.target.value))} />
             </label>
+            <label className="grid gap-2 text-sm font-bold">
+              Tags
+              <input
+                className="rounded-xl border border-black/10 p-3"
+                value={tags}
+                onChange={(event) => setTags(event.target.value)}
+                placeholder="hero, room, team"
+              />
+            </label>
             <button className="rounded-full bg-ink px-4 py-3 text-sm font-black text-white" onClick={saveSelected}>
               Metadaten speichern
             </button>
+            <div className="rounded-xl border border-black/10 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-black">Usage Finder</p>
+                <span className="rounded-full bg-black/[0.06] px-2 py-1 text-xs font-black">
+                  {usages.length}
+                </span>
+              </div>
+              <div className="mt-3 grid gap-2">
+                {usages.length ? (
+                  usages.map((usage) => (
+                    <a
+                      key={usage.id}
+                      className="rounded-lg bg-paper p-3 text-sm font-bold transition hover:bg-black/[0.06]"
+                      href={usage.href ?? "#"}
+                    >
+                      <span className="block">{usage.location}</span>
+                      <span className="mt-1 block text-xs font-medium text-black/45">
+                        {usage.entityType} · {usage.fieldPath}
+                      </span>
+                    </a>
+                  ))
+                ) : (
+                  <p className="text-sm font-bold text-black/45">Noch keine Verwendung gefunden.</p>
+                )}
+              </div>
+            </div>
           </div>
         ) : (
           <p className="mt-4 text-sm font-bold text-black/45">Asset auswählen.</p>
