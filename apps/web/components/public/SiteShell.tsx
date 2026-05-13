@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { SiteContext } from "@flamingo/cms-core";
 import { Marquee } from "./ShowcaseFx";
 
@@ -8,37 +9,21 @@ export function SiteShell({
   context: SiteContext;
   children: React.ReactNode;
 }) {
-  const nav = context.navigation[0]?.items ?? [];
-  const navItems = nav.length
-    ? nav
-    : [
-        { id: "templates", label: "Templates", href: "/beispiele" },
-        { id: "angebot", label: "Angebot", href: "/angebot" },
-        { id: "prozess", label: "Prozess", href: "/prozess" },
-        { id: "kontakt", label: "Kontakt", href: "/kontakt" }
-      ];
+  const navItems = [
+    { id: "templates", label: "Templates", href: "/beispiele" },
+    { id: "prozess", label: "Ablauf", href: "/prozess" },
+    { id: "preise", label: "Preise", href: "/preise" },
+    { id: "about", label: "Ueber uns", href: "/ueber-uns" },
+    { id: "kontakt", label: "Kontakt", href: "/kontakt" }
+  ];
 
   return (
     <div className="showcase-root min-h-screen bg-paper text-ink">
-      <div className="bg-flamingo py-2 text-[11px] font-black uppercase tracking-[0.22em] text-white">
-        <Marquee
-          items={[
-            "FlamingoMedia CMS",
-            "Templates fuer lokale Marken",
-            "Admin Demo",
-            "Foerdercheck",
-            "Vercel + Neon + Blob"
-          ]}
-          speed={28}
-        />
-      </div>
       <header className="sticky top-0 z-40 border-b border-black/10 bg-[#fbfaf8]/88 px-5 py-3 backdrop-blur-xl md:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
-          <a className="group flex items-center gap-3 text-lg font-black" href="/">
-            <span className="grid h-10 w-10 place-items-center rounded-[7px] bg-ink text-sm text-white transition group-hover:bg-flamingo">
-              F
-            </span>
-            <span className="tracking-[-0.02em]">{context.globalSettings.brand.name}</span>
+          <a className="group flex items-center gap-3 text-lg font-black" href="/" aria-label="FlamingoMedia Home">
+            <Image src="/brand/flamingo-icon.png" alt="" width={44} height={44} className="h-11 w-11 object-contain transition group-hover:scale-105" />
+            <span className="tracking-[-0.02em]">FlamingoMedia</span>
           </a>
           <nav className="hidden items-center gap-6 text-sm font-bold md:flex">
             {navItems.map((item) => (
@@ -52,8 +37,8 @@ export function SiteShell({
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <a className="showcase-button showcase-button-compact hidden lg:inline-flex" href="/angebot">
-              Angebot
+            <a className="showcase-button showcase-button-compact hidden lg:inline-flex" href="/preise">
+              Preise
             </a>
             <a className="showcase-button showcase-button-compact hidden sm:inline-flex" href="/beispiele">
               Templates
@@ -66,9 +51,9 @@ export function SiteShell({
       </header>
       <main>{children}</main>
       <footer className="overflow-hidden bg-ink px-5 py-14 text-white md:px-8 md:py-20">
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1fr_auto]">
+        <div className="mx-auto grid max-w-7xl gap-10 border-b border-white/10 pb-14 md:grid-cols-[1fr_auto]">
           <div>
-            <p className="text-5xl font-black leading-none md:text-7xl">{context.globalSettings.brand.name}</p>
+            <Image src="/brand/flamingo-full.png" alt="FlamingoMedia" width={260} height={120} className="h-24 w-auto object-contain" />
             <p className="mt-5 max-w-xl text-lg leading-8 text-white/60">
               {context.globalSettings.brand.tagline}
             </p>
@@ -82,15 +67,25 @@ export function SiteShell({
             </div>
           </div>
           <div className="grid gap-3 text-sm font-bold text-white/60">
-            <a href="/angebot">Angebot</a>
-            <a href="/prozess">Prozess</a>
+            <a href="/beispiele">Templates</a>
+            <a href="/prozess">Ablauf</a>
+            <a href="/preise">Preise</a>
+            <a href="/ueber-uns">Ueber uns</a>
             <a href="/admin-demo">Admin-Demo</a>
             <a href="/impressum">Impressum</a>
             <a href="/datenschutz">Datenschutz</a>
           </div>
         </div>
-        <div className="mt-14 border-t border-white/10 pt-8 text-[18vw] font-black leading-[0.75] tracking-[-0.08em] text-white/[0.06]">
-          FLAMINGO
+        <div className="mx-auto mt-12 max-w-7xl">
+          <Marquee
+            items={["FLAMINGOMEDIA", "WEBSITES", "CONTENT", "CMS", "DACH"]}
+            speed={42}
+            className="text-white/16"
+          />
+        </div>
+        <div className="mx-auto mt-10 flex max-w-7xl flex-col justify-between gap-2 border-t border-white/10 pt-6 text-xs text-white/45 md:flex-row">
+          <span>© {new Date().getFullYear()} FlamingoMedia. Alle Rechte vorbehalten.</span>
+          <span className="font-mono">Made with care · Innsbruck</span>
         </div>
       </footer>
     </div>

@@ -1,16 +1,15 @@
 import { notFound } from "next/navigation";
-import { AddonsSection, CalloutFooter, ContactSection, PricingSection } from "../../components/public/MarketingSections";
+import { AboutSection, CalloutFooter, NumbersSection } from "../../components/public/MarketingSections";
 import { SiteShell } from "../../components/public/SiteShell";
 import { getSiteContext } from "../../lib/seed";
 
-export default function OfferPage() {
+export default function AboutPage() {
   const context = getSiteContext("/") ?? notFound();
 
   return (
     <SiteShell context={context}>
-      <PricingSection />
-      <AddonsSection />
-      <ContactSection />
+      <AboutSection />
+      <NumbersSection />
       <CalloutFooter />
     </SiteShell>
   );

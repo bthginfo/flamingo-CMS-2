@@ -438,3 +438,79 @@ select {
   background: linear-gradient(90deg, transparent, rgba(240, 100, 114, 0.32), rgba(125, 211, 199, 0.14), transparent);
   transform: skewY(-6deg);
 }
+
+.agency-hero {
+  background:
+    radial-gradient(48rem 34rem at 18% 10%, rgba(240, 100, 114, 0.2), transparent 70%),
+    radial-gradient(46rem 32rem at 88% 0%, rgba(124, 58, 237, 0.18), transparent 70%),
+    #0b1020;
+}
+
+.agency-hero-grid,
+.agency-band::before {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  content: "";
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.agency-hero-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 8% auto auto 52%;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 999px;
+  background: rgba(240, 100, 114, 0.22);
+  filter: blur(90px);
+}
+
+.agency-band {
+  position: relative;
+  overflow: hidden;
+}
+
+.agency-band > * {
+  position: relative;
+}
+
+.agency-card {
+  border: 1px solid rgba(16, 19, 23, 0.1);
+  border-radius: 1.5rem;
+  box-shadow: 0 22px 70px rgba(16, 19, 23, 0.06);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.agency-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(240, 100, 114, 0.45);
+  box-shadow: 0 32px 90px rgba(16, 19, 23, 0.12);
+}
+
+.agency-device {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 38px 110px rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(18px);
+}
+
+.agency-device-screen {
+  display: grid;
+  min-height: 560px;
+  align-content: end;
+  gap: 1.3rem;
+  padding: 2rem;
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent 62%),
+    url("https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=85") center/cover;
+}

@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import { ContactSection } from "../../components/public/MarketingSections";
+import { ContactSection, RegionSection } from "../../components/public/MarketingSections";
 import { SiteShell } from "../../components/public/SiteShell";
-import { SubpageHero } from "../../components/public/SubpageHero";
 import { getSiteContext } from "../../lib/seed";
 
 export default function ContactPage() {
@@ -9,8 +8,8 @@ export default function ContactPage() {
 
   return (
     <SiteShell context={context}>
-      <SubpageHero page="kontakt" />
       <ContactSection />
+      <RegionSection />
     </SiteShell>
   );
 }
