@@ -4,13 +4,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { CollectionItem } from "@flamingo/cms-core";
 import { adminFetch } from "./api-client";
+import { CmsFieldEditor } from "./CmsFieldEditor";
+import { collectionSchemaToAdminFields } from "./collection-field-schema";
 
 type Draft = {
   title: string;
   slug: string;
   status: CollectionItem["status"];
   hasDetailPage: boolean;
-  dataJson: string;
+  data: Record<string, unknown>;
   metaTitle: string;
   metaDescription: string;
   ogImage: string;
@@ -22,7 +24,7 @@ function makeDraft(item: CollectionItem): Draft {
     slug: item.slug,
     status: item.status,
     hasDetailPage: item.hasDetailPage,
-    dataJson: JSON.stringify(item.data, null, 2),
+    data: item.data,
     metaTitle: item.seo.metaTitle ?? "",
     metaDescription: item.seo.metaDescription ?? "",
     ogImage: item.seo.ogImage ?? ""
@@ -31,9 +33,11 @@ function makeDraft(item: CollectionItem): Draft {
 
 export function CollectionItemsEditor({
   collectionKey,
+  schema,
   items
 }: {
   collectionKey: string;
+  schema: Record<string, unknown>;
   items: CollectionItem[];
 }) {
   const router = useRouter();
@@ -46,21 +50,13 @@ export function CollectionItemsEditor({
   const [error, setError] = useState<string | null>(null);
   const selected = items.find((item) => item.id === selectedId) ?? items[0];
   const draft = selected ? drafts[selected.id] ?? makeDraft(selected) : null;
+  const fields = collectionSchemaToAdminFields(schema);
 
   function updateDraft(itemId: string, patch: Partial<Draft>) {
     setDrafts((current) => ({ ...current, [itemId]: { ...current[itemId], ...patch } }));
   }
 
   async function save(item: CollectionItem, draft: Draft) {
-    let data: Record<string, unknown>;
-
-    try {
-      data = JSON.parse(draft.dataJson) as Record<string, unknown>;
-    } catch {
-      setError("Daten-JSON ist nicht gueltig.");
-      return;
-    }
-
     setPending("save");
     setError(null);
     setMessage(null);
@@ -72,7 +68,7 @@ export function CollectionItemsEditor({
         slug: draft.slug,
         status: draft.status,
         hasDetailPage: draft.hasDetailPage,
-        data,
+        data: draft.data,
         seo: {
           metaTitle: draft.metaTitle,
           metaDescription: draft.metaDescription,
@@ -201,10 +197,24 @@ export function CollectionItemsEditor({
           Meta Description
           <textarea className="min-h-[90px] rounded-xl border border-black/10 bg-[#fbfaf8] p-3" value={draft.metaDescription} onChange={(event) => updateDraft(selected.id, { metaDescription: event.target.value })} />
         </label>
-        <label className="grid gap-2 text-sm font-bold">
-          Strukturierte Daten
-          <textarea className="min-h-[260px] rounded-xl border border-black/10 bg-[#fbfaf8] p-3 font-mono text-xs leading-5" value={draft.dataJson} onChange={(event) => updateDraft(selected.id, { dataJson: event.target.value })} />
-        </label>
+        <div className="grid gap-4 rounded-2xl border border-black/10 bg-white p-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-black/40">Collection Daten</p>
+            <h3 className="mt-1 text-lg font-black">Felder aus dem Collection-Schema</h3>
+          </div>
+          {fields.map((field) => (
+            <CmsFieldEditor
+              key={field.name}
+              field={field}
+              value={draft.data[field.name]}
+              onChange={(value) =>
+                updateDraft(selected.id, {
+                  data: { ...draft.data, [field.name]: value }
+                })
+              }
+            />
+          ))}
+        </div>
         <button className="rounded-full bg-ink px-5 py-3 text-sm font-black text-white disabled:opacity-50" disabled={pending !== null} onClick={() => save(selected, draft)}>
           Speichern
         </button>

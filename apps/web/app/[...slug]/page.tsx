@@ -8,6 +8,10 @@ import { getPublicSiteContext, getPublicSiteContextOrSeed } from "../../lib/site
 type DetailCta = {
   label?: unknown;
   href?: unknown;
+  externalUrl?: unknown;
+  pageReference?: unknown;
+  sectionReference?: unknown;
+  type?: unknown;
 };
 
 const RESERVED_DETAIL_KEYS = new Set([
@@ -29,8 +33,66 @@ function getString(value: unknown) {
   return typeof value === "string" ? value : "";
 }
 
+function getMediaUrl(value: unknown) {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (typeof value === "object" && value !== null) {
+    const media = value as Record<string, unknown>;
+    return getString(media.imageFile) || getString(media.url) || getString(media.src);
+  }
+
+  return "";
+}
+
 function getStringList(value: unknown) {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => {
+      if (typeof item === "string") {
+        return item;
+      }
+
+      if (typeof item === "object" && item !== null && "text" in item) {
+        return getString((item as Record<string, unknown>).text);
+      }
+
+      return "";
+    })
+    .filter(Boolean);
+}
+
+function getMediaList(value: unknown) {
+  return Array.isArray(value) ? value.map(getMediaUrl).filter(Boolean) : [];
+}
+
+function getButtonHref(item: DetailCta) {
+  const type = getString(item.type);
+
+  if (type === "email") {
+    const target = getString(item.externalUrl) || getString(item.href);
+    return target.startsWith("mailto:") ? target : `mailto:${target}`;
+  }
+
+  if (type === "phone") {
+    const target = getString(item.externalUrl) || getString(item.href);
+    return target.startsWith("tel:") ? target : `tel:${target}`;
+  }
+
+  if (type === "internalPage") {
+    return getString(item.pageReference) || getString(item.href);
+  }
+
+  if (type === "pageSection") {
+    const target = getString(item.sectionReference);
+    return target.startsWith("#") ? target : `#${target}`;
+  }
+
+  return getString(item.externalUrl) || getString(item.href);
 }
 
 function getCtas(value: unknown) {
@@ -42,7 +104,7 @@ function getCtas(value: unknown) {
     .filter((item): item is DetailCta => typeof item === "object" && item !== null)
     .map((item) => ({
       label: getString(item.label),
-      href: getString(item.href)
+      href: getButtonHref(item)
     }))
     .filter((item) => item.label && item.href);
 }
@@ -91,8 +153,8 @@ export default async function DynamicCmsPage({ params }: { params: { slug: strin
     getString(item.data.description) || getString(item.data.excerpt) || getString(item.data.teaserText);
   const teaserText = getString(item.data.teaserText) || getString(item.data.excerpt);
   const richIntro = getString(item.data.richIntro);
-  const featuredImage = getString(item.data.featuredImage);
-  const gallery = getStringList(item.data.gallery);
+  const featuredImage = getMediaUrl(item.data.featuredImage);
+  const gallery = getMediaList(item.data.gallery);
   const chips = [
     ...getStringList(item.data.features),
     ...getStringList(item.data.facts),

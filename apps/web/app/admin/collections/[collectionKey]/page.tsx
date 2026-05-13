@@ -27,11 +27,11 @@ export default function CollectionDetailPage({
           </p>
         </div>
         <div className="mt-8">
-          <CollectionItemsEditor collectionKey={collection.key} items={collection.items} />
+          <CollectionItemsEditor collectionKey={collection.key} schema={collection.schema} items={collection.items} />
         </div>
       </section>
       <aside>
-        <CollectionItemForm collectionKey={collection.key} />
+        <CollectionItemForm collectionKey={collection.key} schema={collection.schema} />
       </aside>
     </div>
   );

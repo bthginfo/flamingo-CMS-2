@@ -3,8 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { adminFetch } from "./api-client";
+import { createEmptyCollectionData } from "./collection-field-schema";
 
-export function CollectionItemForm({ collectionKey }: { collectionKey: string }) {
+export function CollectionItemForm({
+  collectionKey,
+  schema
+}: {
+  collectionKey: string;
+  schema: Record<string, unknown>;
+}) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -22,7 +29,14 @@ export function CollectionItemForm({ collectionKey }: { collectionKey: string })
     const response = await adminFetch(`/api/admin/collections/${collectionKey}/items`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ title, slug, description, hasDetailPage, status, data: {} })
+      body: JSON.stringify({
+        title,
+        slug,
+        description,
+        hasDetailPage,
+        status,
+        data: { ...createEmptyCollectionData(schema), description }
+      })
     });
     const result = await response.json();
 
