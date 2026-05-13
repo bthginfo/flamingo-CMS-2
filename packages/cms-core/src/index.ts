@@ -470,6 +470,26 @@ export const createCollectionItemInputSchema = z.object({
   data: z.record(z.unknown()).default({})
 });
 
+export const updateCollectionItemInputSchema = z.object({
+  title: z.string().min(2).optional(),
+  slug: z.string().min(1).regex(/^\/?[a-z0-9][a-z0-9-/]*$/).optional(),
+  status: z.enum(["draft", "published", "archived"]).optional(),
+  hasDetailPage: z.boolean().optional(),
+  data: z.record(z.unknown()).optional(),
+  seo: z
+    .object({
+      metaTitle: z.string().optional(),
+      metaDescription: z.string().optional(),
+      ogTitle: z.string().optional(),
+      ogDescription: z.string().optional(),
+      ogImage: z.string().optional(),
+      canonical: z.string().optional(),
+      robots: z.enum(["index,follow", "noindex,nofollow"]).optional(),
+      schemaOrg: z.record(z.unknown()).optional()
+    })
+    .optional()
+});
+
 export const createFormSubmissionInputSchema = z.object({
   data: z.record(z.unknown()),
   sourcePage: z.string().optional()

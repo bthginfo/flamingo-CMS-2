@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { CollectionItemsEditor } from "../../../../components/admin/CollectionItemsEditor";
 import { CollectionItemForm } from "../../../../components/admin/CollectionItemForm";
 import { collections } from "../../../../lib/seed";
 
@@ -25,27 +26,8 @@ export default function CollectionDetailPage({
             {collection.detailPagesEnabled ? "aktiv" : "inaktiv"}
           </p>
         </div>
-        <div className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm">
-          {collection.items.map((item) => (
-            <article
-              key={item.id}
-              className="grid gap-4 border-b border-black/5 p-5 md:grid-cols-[1fr_160px_150px]"
-            >
-              <div>
-                <p className="font-black">{item.title}</p>
-                <p className="text-sm text-black/50">
-                  /{collection.key}/{item.slug}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-black/60">
-                  {String(item.data.description ?? "")}
-                </p>
-              </div>
-              <span className="text-sm font-bold text-black/55">{item.status}</span>
-              <span className="text-sm font-bold text-black/55">
-                {item.hasDetailPage ? "Detailseite" : "Nur Liste"}
-              </span>
-            </article>
-          ))}
+        <div className="mt-8">
+          <CollectionItemsEditor collectionKey={collection.key} items={collection.items} />
         </div>
       </section>
       <aside>

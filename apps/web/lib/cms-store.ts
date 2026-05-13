@@ -7,9 +7,11 @@ import {
   createPageInputSchema,
   createPageSnapshot,
   isSectionAllowedForPage,
+  updateCollectionItemInputSchema,
   updateSectionInputSchema,
   type AuthenticatedUser,
   type AuditLog,
+  type CollectionItem,
   type FormSubmission,
   type MediaAsset,
   type Page,
@@ -471,6 +473,77 @@ export function createCollectionItem(
     after: item
   });
   return item;
+}
+
+export function updateCollectionItem(
+  user: AuthenticatedUser,
+  collectionKey: string,
+  itemId: string,
+  input: unknown
+) {
+  requirePermission(user, "content:update");
+  const collection = listCollection(user, collectionKey) ?? fail("Collection not found");
+  const item = assertTenantScope(
+    collection.items.find((candidate) => candidate.id === itemId) ?? fail("Collection item not found"),
+    user.tenantId
+  );
+  const parsed = updateCollectionItemInputSchema.parse(input);
+  const before = { ...item, data: { ...item.data }, seo: { ...item.seo } };
+
+  if (parsed.title !== undefined) {
+    item.title = parsed.title;
+  }
+
+  if (parsed.slug !== undefined) {
+    const cleanSlug = slugify(parsed.slug.replace(/^\//, ""));
+    const taken = collection.items.some((candidate) => candidate.id !== item.id && candidate.slug === cleanSlug);
+
+    if (taken) {
+      throw new Error("Collection item slug already exists");
+    }
+
+    item.slug = cleanSlug;
+  }
+
+  item.status = parsed.status ?? item.status;
+  item.hasDetailPage = parsed.hasDetailPage ?? item.hasDetailPage;
+  item.data = parsed.data ? { ...item.data, ...parsed.data } : item.data;
+  item.seo = parsed.seo ? { ...item.seo, ...parsed.seo } : item.seo;
+  item.updatedAt = new Date();
+
+  audit(user, {
+    action: "collection_item_update",
+    entityType: "collection_item",
+    entityId: item.id,
+    before,
+    after: item
+  });
+  return item;
+}
+
+export function deleteCollectionItem(
+  user: AuthenticatedUser,
+  collectionKey: string,
+  itemId: string
+) {
+  requirePermission(user, "content:update");
+  const collection = listCollection(user, collectionKey) ?? fail("Collection not found");
+  const index = collection.items.findIndex((candidate) => candidate.id === itemId);
+
+  if (index === -1) {
+    fail("Collection item not found");
+  }
+
+  const item = assertTenantScope(collection.items[index] as CollectionItem, user.tenantId);
+  const [removed] = collection.items.splice(index, 1);
+
+  audit(user, {
+    action: "collection_item_delete",
+    entityType: "collection_item",
+    entityId: item.id,
+    before: removed
+  });
+  return removed;
 }
 
 export function listForms(user: AuthenticatedUser) {
