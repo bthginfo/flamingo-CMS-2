@@ -1,15 +1,9 @@
-import { notFound } from "next/navigation";
-import { ContactSection, RegionSection } from "../../components/public/MarketingSections";
-import { SiteShell } from "../../components/public/SiteShell";
-import { getSiteContext } from "../../lib/seed";
+import { AgencyContactPage, AgencyShell } from "../../components/public/AgencyMarketing";
 
 export default function ContactPage() {
-  const context = getSiteContext("/kontakt") ?? getSiteContext("/") ?? notFound();
-
   return (
-    <SiteShell context={context}>
-      <ContactSection />
-      <RegionSection />
-    </SiteShell>
+    <AgencyShell active="kontakt">
+      <AgencyContactPage />
+    </AgencyShell>
   );
 }
