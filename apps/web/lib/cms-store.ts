@@ -138,6 +138,94 @@ export function updateAdminPage(
   return page;
 }
 
+export function duplicateAdminPage(user: AuthenticatedUser, pageId: string) {
+  requirePermission(user, "content:update");
+  const source = assertTenantScope(
+    pages.find((candidate) => candidate.id === pageId) ?? fail("Page not found"),
+    user.tenantId
+  );
+  const baseSlug = source.slug ? `${source.slug}-kopie` : "home-kopie";
+  let cleanSlug = slugify(baseSlug);
+  let counter = 2;
+
+  while (pages.some((page) => page.tenantId === user.tenantId && page.slug === cleanSlug)) {
+    cleanSlug = slugify(`${baseSlug}-${counter}`);
+    counter += 1;
+  }
+
+  const page: Page = {
+    ...source,
+    id: id("page"),
+    title: `${source.title} Kopie`,
+    slug: cleanSlug,
+    fullPath: `/${cleanSlug}`,
+    status: "draft",
+    isHomepage: false,
+    sortOrder: pages.length,
+    createdBy: user.id,
+    updatedBy: user.id,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  const sourceSections = sections
+    .filter((section) => section.tenantId === user.tenantId && section.pageId === source.id)
+    .sort((a, b) => a.order - b.order);
+  const clonedSections = sourceSections.map((section) => ({
+    ...section,
+    id: id("section"),
+    pageId: page.id,
+    createdBy: user.id,
+    updatedBy: user.id,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }));
+
+  pages.push(page);
+  sections.push(...clonedSections);
+  audit(user, {
+    action: "page_duplicate",
+    entityType: "page",
+    entityId: page.id,
+    after: { page, sections: clonedSections }
+  });
+  return page;
+}
+
+export function deleteAdminPage(user: AuthenticatedUser, pageId: string) {
+  requirePermission(user, "content:update");
+  const index = pages.findIndex((candidate) => candidate.id === pageId);
+
+  if (index === -1) {
+    fail("Page not found");
+  }
+
+  const page = assertTenantScope(pages[index], user.tenantId);
+
+  if (page.isHomepage || page.fullPath === "/") {
+    throw new Error("Homepage cannot be deleted");
+  }
+
+  const [removed] = pages.splice(index, 1);
+  const removedSections = sections.filter(
+    (section) => section.tenantId === user.tenantId && section.pageId === page.id
+  );
+
+  for (const section of removedSections) {
+    const sectionIndex = sections.findIndex((candidate) => candidate.id === section.id);
+    if (sectionIndex >= 0) {
+      sections.splice(sectionIndex, 1);
+    }
+  }
+
+  audit(user, {
+    action: "page_delete",
+    entityType: "page",
+    entityId: removed.id,
+    before: { page: removed, sections: removedSections }
+  });
+  return removed;
+}
+
 export function addSectionToPage(user: AuthenticatedUser, pageId: string, input: unknown) {
   requirePermission(user, "content:update");
   const page = assertTenantScope(

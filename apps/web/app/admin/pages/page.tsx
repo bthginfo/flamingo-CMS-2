@@ -1,4 +1,5 @@
-import { AdminMetric, AdminPageHeader, AdminPanel, StatusPill } from "../../../components/admin/AdminUi";
+import { AdminMetric, AdminPageHeader, AdminPanel } from "../../../components/admin/AdminUi";
+import { AdminPagesClient } from "../../../components/admin/AdminPagesClient";
 import { pages, sections } from "../../../lib/seed";
 
 export default function AdminPages() {
@@ -22,27 +23,12 @@ export default function AdminPages() {
       </div>
 
       <AdminPanel title="Page Inventory">
-        <div className="overflow-hidden rounded-lg border border-black/10">
-          {pages.map((page) => {
-            const pageSections = sections.filter((section) => section.pageId === page.id);
-            return (
-              <a
-                key={page.id}
-                className="grid gap-4 border-b border-black/5 bg-white p-5 transition last:border-0 hover:bg-paper md:grid-cols-[1fr_150px_120px_120px_110px]"
-                href={`/admin/pages/${page.id}`}
-              >
-                <div>
-                  <p className="text-lg font-black">{page.title}</p>
-                  <p className="mt-1 text-sm text-black/50">{page.fullPath}</p>
-                </div>
-                <p className="text-sm font-bold text-black/60">{page.type}</p>
-                <p className="text-sm font-bold text-black/60">{pageSections.length} Sections</p>
-                <StatusPill tone={page.status === "published" ? "live" : "draft"}>{page.status}</StatusPill>
-                <p className="text-sm font-black text-black/45">Bearbeiten</p>
-              </a>
-            );
-          })}
-        </div>
+        <AdminPagesClient
+          pages={pages.map((page) => ({
+            ...page,
+            sectionCount: sections.filter((section) => section.pageId === page.id).length
+          }))}
+        />
       </AdminPanel>
     </div>
   );
