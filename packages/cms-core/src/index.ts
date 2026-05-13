@@ -505,6 +505,13 @@ export const createFormSubmissionInputSchema = z.object({
   sourcePage: z.string().optional()
 });
 
+export const updateFormDefinitionInputSchema = z.object({
+  label: z.string().min(2).optional(),
+  submitLabel: z.string().min(1).optional(),
+  successMessage: z.string().min(1).optional(),
+  notificationEmail: z.string().email().optional().or(z.literal(""))
+});
+
 export type AuditLog = {
   id: string;
   tenantId: string;

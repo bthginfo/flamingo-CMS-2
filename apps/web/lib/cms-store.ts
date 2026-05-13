@@ -8,6 +8,7 @@ import {
   createPageSnapshot,
   isSectionAllowedForPage,
   updateCollectionItemInputSchema,
+  updateFormDefinitionInputSchema,
   updateSectionInputSchema,
   type AuthenticatedUser,
   type AuditLog,
@@ -550,6 +551,30 @@ export function deleteCollectionItem(
 export function listForms(user: AuthenticatedUser) {
   requirePermission(user, "forms:read");
   return formDefinitions.filter((form) => form.tenantId === user.tenantId);
+}
+
+export function updateFormDefinition(user: AuthenticatedUser, formKey: string, input: unknown) {
+  requirePermission(user, "forms:read");
+  const form = assertTenantScope(
+    formDefinitions.find((candidate) => candidate.key === formKey) ?? fail("Form not found"),
+    user.tenantId
+  );
+  const parsed = updateFormDefinitionInputSchema.parse(input);
+  const before = { ...form };
+
+  form.label = parsed.label ?? form.label;
+  form.submitLabel = parsed.submitLabel ?? form.submitLabel;
+  form.successMessage = parsed.successMessage ?? form.successMessage;
+  form.notificationEmail = parsed.notificationEmail || undefined;
+
+  audit(user, {
+    action: "form_definition_update",
+    entityType: "form_definition",
+    entityId: form.id,
+    before,
+    after: form
+  });
+  return form;
 }
 
 export function listFormSubmissions(user: AuthenticatedUser) {
