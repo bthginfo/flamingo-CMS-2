@@ -157,6 +157,8 @@ export type AdminFieldDefinition = {
     | "spacing";
   required?: boolean;
   options?: string[];
+  fields?: AdminFieldDefinition[];
+  itemLabel?: string;
 };
 
 export type SectionDefinition<TData = unknown> = {

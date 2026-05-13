@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { SectionDefinition, SectionDesignSettings } from "@flamingo/cms-core";
+import type { AdminFieldDefinition, SectionDefinition, SectionDesignSettings } from "@flamingo/cms-core";
 import type { SiteContext } from "@flamingo/cms-core";
 import { calculateTirolFunding, tirolFundingConfig } from "@flamingo/funding";
 import { cn, industries, styles } from "@flamingo/shared";
@@ -93,6 +93,54 @@ const imageSchema = z.object({
 
 type CmsButton = z.infer<typeof buttonSchema>;
 type CmsImage = z.infer<typeof imageSchema>;
+
+const buttonAdminFields: AdminFieldDefinition[] = [
+  { name: "label", label: "Label", type: "text", required: true },
+  { name: "type", label: "Zieltyp", type: "select", required: true, options: ["external", "internalPage", "pageSection", "email", "phone"] },
+  { name: "externalUrl", label: "Externe URL / E-Mail / Telefon", type: "text" },
+  { name: "pageReference", label: "Interne Seite", type: "page-picker" },
+  { name: "sectionReference", label: "Section Anchor", type: "text" },
+  { name: "openInNewTab", label: "In neuem Tab öffnen", type: "boolean" },
+  { name: "ariaLabel", label: "Aria Label", type: "text" },
+  { name: "styleVariant", label: "Button Stil", type: "select", options: ["primary", "secondary", "ghost", "text"] },
+  { name: "icon", label: "Icon", type: "icon" }
+];
+
+const imageAdminFields: AdminFieldDefinition[] = [
+  { name: "sourceType", label: "Quelle", type: "select", required: true, options: ["upload", "url", "embed"] },
+  { name: "imageFile", label: "Media Library Asset", type: "text" },
+  { name: "url", label: "Externe URL", type: "text" },
+  { name: "src", label: "Legacy Bild-URL", type: "text" },
+  { name: "embedCode", label: "Embed Code", type: "textarea" },
+  { name: "alt", label: "Alt-Text", type: "text", required: true },
+  { name: "caption", label: "Caption", type: "textarea" },
+  {
+    name: "focalPoint",
+    label: "Fokuspunkt",
+    type: "map",
+    fields: [
+      { name: "x", label: "Fokus X", type: "number" },
+      { name: "y", label: "Fokus Y", type: "number" }
+    ]
+  },
+  { name: "posterImage", label: "Video Poster", type: "image" }
+];
+
+const ctaAdminField = (name: string, label: string, required = false): AdminFieldDefinition => ({
+  name,
+  label,
+  type: "button-group",
+  required,
+  fields: buttonAdminFields
+});
+
+const imageAdminField = (name: string, label: string, required = false): AdminFieldDefinition => ({
+  name,
+  label,
+  type: "image",
+  required,
+  fields: imageAdminFields
+});
 
 function getButtonHref(button: CmsButton) {
   if (button.type === "email") {
@@ -1380,9 +1428,22 @@ export const sectionDefinitions: SectionDefinition[] = [
     defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
     adminFields: [
       { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
       { name: "description", label: "Beschreibung", type: "textarea" },
-      { name: "items", label: "Kacheln", type: "repeater", required: true },
-      { name: "icon", label: "Icons", type: "icon" }
+      {
+        name: "items",
+        label: "Kacheln",
+        type: "repeater",
+        required: true,
+        itemLabel: "Kachel",
+        fields: [
+          { name: "title", label: "Titel", type: "text", required: true },
+          { name: "body", label: "Text", type: "textarea", required: true },
+          { name: "icon", label: "Icon", type: "icon" },
+          { name: "href", label: "Ziel", type: "page-picker" },
+          imageAdminField("image", "Bild")
+        ]
+      }
     ],
     allowedPageTypes: ["home", "standard", "landing"],
     designRole: "sortable"
@@ -1419,8 +1480,14 @@ export const sectionDefinitions: SectionDefinition[] = [
     adminFields: [
       { name: "headline", label: "Headline", type: "text", required: true },
       { name: "description", label: "Beschreibung", type: "textarea" },
-      { name: "images", label: "Bilder", type: "repeater", required: true },
-      { name: "image", label: "Bild", type: "image" }
+      {
+        name: "images",
+        label: "Bilder",
+        type: "repeater",
+        required: true,
+        itemLabel: "Bild",
+        fields: imageAdminFields
+      }
     ],
     allowedPageTypes: ["home", "standard", "collection_detail_template"],
     designRole: "media"
@@ -1446,7 +1513,19 @@ export const sectionDefinitions: SectionDefinition[] = [
     defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
     adminFields: [
       { name: "headline", label: "Headline", type: "text", required: true },
-      { name: "testimonials", label: "Testimonials", type: "repeater", required: true }
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      {
+        name: "testimonials",
+        label: "Testimonials",
+        type: "repeater",
+        required: true,
+        itemLabel: "Zitat",
+        fields: [
+          { name: "quote", label: "Zitat", type: "textarea", required: true },
+          { name: "name", label: "Name", type: "text", required: true },
+          { name: "role", label: "Rolle", type: "text" }
+        ]
+      }
     ]
   },
   {
@@ -1513,9 +1592,21 @@ export const sectionDefinitions: SectionDefinition[] = [
     defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
     adminFields: [
       { name: "address", label: "Adresse", type: "text", required: true },
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "headline", label: "Headline", type: "text", required: true },
       { name: "phone", label: "Telefon", type: "text" },
       { name: "email", label: "E-Mail", type: "text" },
-      { name: "hours", label: "Oeffnungszeiten", type: "opening-hours", required: true },
+      {
+        name: "hours",
+        label: "Oeffnungszeiten",
+        type: "opening-hours",
+        required: true,
+        itemLabel: "Zeit",
+        fields: [
+          { name: "day", label: "Tag", type: "text", required: true },
+          { name: "value", label: "Zeit", type: "text", required: true }
+        ]
+      },
       { name: "map", label: "Karte", type: "map" }
     ],
     allowedIndustries: ["restaurant", "hotel", "tourism", "salon", "trades", "medical", "fitness", "real-estate", "wedding"],
@@ -1603,7 +1694,37 @@ export const sectionDefinitions: SectionDefinition[] = [
     defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
     adminFields: [
       { name: "headline", label: "Headline", type: "text", required: true },
-      { name: "categories", label: "Kategorien", type: "repeater", required: true }
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "description", label: "Beschreibung", type: "textarea" },
+      {
+        name: "categories",
+        label: "Kategorien",
+        type: "repeater",
+        required: true,
+        itemLabel: "Kategorie",
+        fields: [
+          { name: "name", label: "Kategoriename", type: "text", required: true },
+          {
+            name: "items",
+            label: "Gerichte",
+            type: "repeater",
+            required: true,
+            itemLabel: "Gericht",
+            fields: [
+              { name: "title", label: "Titel", type: "text", required: true },
+              { name: "description", label: "Beschreibung", type: "textarea", required: true },
+              { name: "price", label: "Preis", type: "text" },
+              {
+                name: "badges",
+                label: "Badges",
+                type: "repeater",
+                itemLabel: "Badge",
+                fields: [{ name: "text", label: "Text", type: "text", required: true }]
+              }
+            ]
+          }
+        ]
+      }
     ],
     allowedIndustries: ["restaurant", "salon", "fitness", "wedding"],
     designRole: "collection"
@@ -1654,8 +1775,17 @@ export const sectionDefinitions: SectionDefinition[] = [
     defaultAnimation: { preset: "reveal", reducedMotionSafe: true },
     adminFields: [
       { name: "headline", label: "Headline", type: "text", required: true },
-      { name: "primaryCta", label: "CTA", type: "button-group", required: true },
-      { name: "highlights", label: "Highlights", type: "repeater" }
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "description", label: "Beschreibung", type: "textarea", required: true },
+      ctaAdminField("primaryCta", "CTA", true),
+      ctaAdminField("secondaryCta", "Sekundaerer CTA"),
+      {
+        name: "highlights",
+        label: "Highlights",
+        type: "repeater",
+        itemLabel: "Highlight",
+        fields: [{ name: "text", label: "Text", type: "text", required: true }]
+      }
     ],
     allowedPageTypes: ["home", "standard", "landing"],
     designRole: "conversion"
@@ -1712,8 +1842,24 @@ export const sectionDefinitions: SectionDefinition[] = [
     defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
     adminFields: [
       { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "description", label: "Beschreibung", type: "textarea" },
       { name: "formKey", label: "Form Key", type: "form-picker", required: true },
-      { name: "fields", label: "Felder", type: "repeater", required: true }
+      {
+        name: "fields",
+        label: "Felder",
+        type: "repeater",
+        required: true,
+        itemLabel: "Feld",
+        fields: [
+          { name: "name", label: "Technischer Name", type: "text", required: true },
+          { name: "label", label: "Label", type: "text", required: true },
+          { name: "type", label: "Feldtyp", type: "select", required: true, options: ["text", "email", "phone", "textarea", "select", "checkbox"] },
+          { name: "required", label: "Pflichtfeld", type: "boolean" }
+        ]
+      },
+      { name: "submitLabel", label: "Submit Label", type: "text" },
+      { name: "privacyNote", label: "Datenschutzhinweis", type: "textarea" }
     ],
     allowedPageTypes: ["home", "standard", "landing"],
     designRole: "conversion"
@@ -1823,8 +1969,9 @@ export const sectionDefinitions: SectionDefinition[] = [
     adminFields: [
       { name: "headline", label: "Headline", type: "text", required: true },
       { name: "description", label: "Beschreibung", type: "textarea" },
-      { name: "primaryCta", label: "Primaerer CTA", type: "button-group", required: true },
-      { name: "secondaryCta", label: "Sekundaerer CTA", type: "button-group" }
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      ctaAdminField("primaryCta", "Primaerer CTA", true),
+      ctaAdminField("secondaryCta", "Sekundaerer CTA")
     ],
     allowedPageTypes: ["home", "standard", "landing", "collection_detail_template"],
     designRole: "conversion"

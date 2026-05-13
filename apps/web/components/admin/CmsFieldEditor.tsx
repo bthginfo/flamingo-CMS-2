@@ -57,6 +57,44 @@ function updateObject<T extends Record<string, unknown>>(value: unknown, patch: 
   return { ...asRecord(value), ...patch };
 }
 
+function createEmptyValue(field: AdminFieldDefinition): unknown {
+  if (field.type === "number") {
+    return 0;
+  }
+
+  if (field.type === "boolean") {
+    return false;
+  }
+
+  if (field.type === "repeater" || field.type === "multi-select") {
+    return [];
+  }
+
+  if (field.type === "image" || field.type === "video") {
+    return { sourceType: "url", alt: "", focalPoint: { x: 50, y: 50 } };
+  }
+
+  if (field.type === "button-group" || field.type === "link") {
+    return { label: "", type: "external", styleVariant: "primary" };
+  }
+
+  if (field.fields?.length) {
+    return field.fields.reduce<Record<string, unknown>>((item, child) => {
+      item[child.name] = createEmptyValue(child);
+      return item;
+    }, {});
+  }
+
+  return "";
+}
+
+function createEmptyRepeaterItem(field: AdminFieldDefinition) {
+  return (field.fields ?? []).reduce<Record<string, unknown>>((item, child) => {
+    item[child.name] = createEmptyValue(child);
+    return item;
+  }, {});
+}
+
 export function CmsFieldEditor({ field, value, onChange }: CmsFieldEditorProps) {
   const baseClass = "rounded-xl border border-black/10 bg-[#fbfaf8] p-3 text-sm";
 
@@ -143,15 +181,40 @@ export function CmsFieldEditor({ field, value, onChange }: CmsFieldEditorProps) 
     return <MediaObjectEditor label={field.label} value={value} onChange={onChange} />;
   }
 
-  if (
-    field.type === "repeater" ||
-    field.type === "opening-hours" ||
-    field.type === "map" ||
-    field.type === "collection-picker" ||
-    field.type === "page-picker" ||
-    field.type === "form-picker"
-  ) {
+  if (field.type === "repeater" && field.fields?.length) {
+    return <RepeaterField field={field} value={value} onChange={onChange} />;
+  }
+
+  if (field.type === "opening-hours" && field.fields?.length) {
+    return <RepeaterField field={field} value={value} onChange={onChange} />;
+  }
+
+  if (field.fields?.length) {
+    return <ObjectField field={field} value={value} onChange={onChange} />;
+  }
+
+  if (field.type === "repeater" || field.type === "opening-hours" || field.type === "map") {
     return <StructuredJsonField field={field} value={value} onChange={onChange} />;
+  }
+
+  if (field.type === "collection-picker" || field.type === "page-picker" || field.type === "form-picker") {
+    return (
+      <label className="grid gap-2 text-sm font-bold">
+        {field.label}
+        <input
+          className={baseClass}
+          value={asString(value)}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={
+            field.type === "collection-picker"
+              ? "Collection Key, z.B. menu"
+              : field.type === "page-picker"
+                ? "Interne Seite, z.B. /speisekarte"
+                : "Form Key, z.B. reservation"
+          }
+        />
+      </label>
+    );
   }
 
   return (
@@ -163,6 +226,121 @@ export function CmsFieldEditor({ field, value, onChange }: CmsFieldEditorProps) 
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
+  );
+}
+
+function ObjectField({
+  field,
+  value,
+  onChange
+}: {
+  field: AdminFieldDefinition;
+  value: unknown;
+  onChange: (value: unknown) => void;
+}) {
+  const objectValue = asRecord(value);
+
+  return (
+    <fieldset className="grid gap-3 rounded-xl border border-black/10 bg-[#fbfaf8] p-3">
+      <legend className="px-1 text-sm font-black">{field.label}</legend>
+      {field.fields?.map((child) => (
+        <CmsFieldEditor
+          key={child.name}
+          field={child}
+          value={objectValue[child.name]}
+          onChange={(nextValue) => onChange({ ...objectValue, [child.name]: nextValue })}
+        />
+      ))}
+    </fieldset>
+  );
+}
+
+function RepeaterField({
+  field,
+  value,
+  onChange
+}: {
+  field: AdminFieldDefinition;
+  value: unknown;
+  onChange: (value: unknown) => void;
+}) {
+  const items = Array.isArray(value) ? value : [];
+  const itemLabel = field.itemLabel ?? "Eintrag";
+  const primitiveChild = field.fields?.length === 1 ? field.fields[0] : undefined;
+
+  const updateItem = (index: number, nextValue: unknown) => {
+    onChange(items.map((item, itemIndex) => (itemIndex === index ? nextValue : item)));
+  };
+
+  const removeItem = (index: number) => {
+    onChange(items.filter((_, itemIndex) => itemIndex !== index));
+  };
+
+  const moveItem = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= items.length) {
+      return;
+    }
+
+    const nextItems = [...items];
+    const [item] = nextItems.splice(index, 1);
+    nextItems.splice(target, 0, item);
+    onChange(nextItems);
+  };
+
+  return (
+    <fieldset className="grid gap-4 rounded-xl border border-black/10 bg-[#fbfaf8] p-3">
+      <legend className="px-1 text-sm font-black">{field.label}</legend>
+      <div className="grid gap-3">
+        {items.map((item, index) => {
+          const record = asRecord(item);
+
+          return (
+            <article key={index} className="grid gap-3 rounded-xl border border-black/10 bg-white p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-black/45">
+                  {itemLabel} {index + 1}
+                </p>
+                <div className="flex gap-2">
+                  <button type="button" className="rounded-lg border border-black/10 px-2 py-1 text-xs font-bold" onClick={() => moveItem(index, -1)}>
+                    Hoch
+                  </button>
+                  <button type="button" className="rounded-lg border border-black/10 px-2 py-1 text-xs font-bold" onClick={() => moveItem(index, 1)}>
+                    Runter
+                  </button>
+                  <button type="button" className="rounded-lg border border-red-200 px-2 py-1 text-xs font-bold text-red-700" onClick={() => removeItem(index)}>
+                    Entfernen
+                  </button>
+                </div>
+              </div>
+              {primitiveChild ? (
+                <CmsFieldEditor
+                  field={primitiveChild}
+                  value={item}
+                  onChange={(nextValue) => updateItem(index, nextValue)}
+                />
+              ) : (
+                field.fields?.map((child) => (
+                  <CmsFieldEditor
+                    key={child.name}
+                    field={child}
+                    value={record[child.name]}
+                    onChange={(nextValue) => updateItem(index, { ...record, [child.name]: nextValue })}
+                  />
+                ))
+              )}
+            </article>
+          );
+        })}
+      </div>
+      <button
+        type="button"
+        className="rounded-xl bg-ink px-4 py-3 text-sm font-black text-white"
+        onClick={() => onChange([...items, primitiveChild ? createEmptyValue(primitiveChild) : createEmptyRepeaterItem(field)])}
+      >
+        {itemLabel} hinzufuegen
+      </button>
+    </fieldset>
   );
 }
 
