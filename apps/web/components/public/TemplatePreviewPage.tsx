@@ -7,7 +7,7 @@ import {
   RoomGridSection,
   TeamGridSection
 } from "@flamingo/sections";
-import type { TemplatePreviewData } from "./template-preview-data";
+import type { TemplatePreviewData, TemplateSubpageData, TemplateSubpageSection } from "./template-preview-data";
 
 const styleCopy: Record<StyleKey, string> = {
   classic: "Ruhig, hochwertig und mit viel Raum fuer Bilder und Vertrauen.",
@@ -30,17 +30,25 @@ const styleDramaturgy: Record<StyleKey, TemplateBlock[]> = {
   bold: ["deepDive", "live", "gallery", "modules", "signature", "highlights", "process"]
 };
 
-export function TemplatePreviewPage({ data }: { data: TemplatePreviewData }) {
+export function TemplatePreviewPage({ data, pageSlug }: { data: TemplatePreviewData; pageSlug?: string }) {
+  const activePage = pageSlug ? data.pages.find((page) => page.slug === pageSlug) : null;
+
   return (
     <div
       className={`template-preview tpl-style-${data.style} tpl-variant-${data.industry}`}
       style={{ ["--tpl-accent" as string]: data.accent, ["--tpl-dark" as string]: data.dark }}
     >
-      <TemplateNav data={data} />
-      <TemplateHero data={data} />
-      {styleDramaturgy[data.style].map((block) => (
-        <TemplateBlockRenderer key={block} block={block} data={data} />
-      ))}
+      <TemplateNav data={data} activeSlug={activePage?.slug} />
+      {activePage ? (
+        <TemplateSubpage data={data} page={activePage} />
+      ) : (
+        <>
+          <TemplateHero data={data} />
+          {styleDramaturgy[data.style].map((block) => (
+            <TemplateBlockRenderer key={block} block={block} data={data} />
+          ))}
+        </>
+      )}
       <TemplateCta data={data} />
     </div>
   );
@@ -112,7 +120,7 @@ const industrySignatureData: Record<
       { label: "Offer", value: "Wellness Weekend", meta: "2 Naechte" },
       { label: "Extra", value: "Late Checkout", meta: "inklusive" }
     ],
-    secondary: ["Keine Portalprovision", "Spa-Zugang sichtbar", "Angebote saisonal pflegbar"],
+    secondary: ["Keine Portalprovision", "Spa-Zugang sichtbar", "Saisonale Angebote"],
     image: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1300&q=85"
   },
   tourism: {
@@ -202,7 +210,7 @@ const industrySignatureData: Record<
   wedding: {
     eyebrow: "Guest Journey",
     title: "Story, Ablauf und RSVP fuehlen sich persoenlich an.",
-    lead: "Eine Hochzeitsseite darf nicht wie ein Business-Template wirken. Sie fuehrt Gaeste emotional durch Geschichte, Location, Tagesplan und Antwortformular.",
+    lead: "Eine Hochzeitsseite fuehrt Gaeste emotional durch Geschichte, Location, Tagesplan und Antwortformular.",
     primary: [
       { label: "Story", value: "Mara & Leo", meta: "seit 2018" },
       { label: "Ablauf", value: "Freie Trauung", meta: "16:00" },
@@ -269,7 +277,7 @@ function TemplateIndustrySignature({ data }: { data: TemplatePreviewData }) {
                 {data.label} / {data.style}
               </p>
               <p className="mt-3 text-3xl font-black leading-none">
-                Branchenlogik statt austauschbarem Template.
+                Ein Auftritt mit eigener Dramaturgie.
               </p>
             </div>
           </div>
@@ -287,12 +295,12 @@ function TemplateIndustryDeepDive({ data }: { data: TemplatePreviewData }) {
         data={{
           eyebrow: "A la carte",
           headline: "Eine Karte, die nach Kueche klingt, nicht nach Datenbank.",
-          description: "Kategorien, Preise, Allergene und saisonale Hinweise bleiben im CMS editierbar.",
+          description: "Kategorien, Preise, Allergene und saisonale Hinweise sind klar und aktuell.",
           categories: [
             {
               name: "Aus der Kueche",
               items: [
-                { title: "Burrata & Pfirsich", description: "Basilikum, Olivenoel, geröstete Mandeln", price: "14", badges: ["vegetarisch"] },
+                { title: "Burrata & Pfirsich", description: "Basilikum, Olivenoel, geroestete Mandeln", price: "14", badges: ["vegetarisch"] },
                 { title: "Truffle Tagliolini", description: "Hausgemachte Pasta, Pecorino, schwarzer Trueffel", price: "24", badges: ["Signature"] }
               ]
             },
@@ -316,11 +324,11 @@ function TemplateIndustryDeepDive({ data }: { data: TemplatePreviewData }) {
         data={{
           eyebrow: "Zimmer",
           headline: "Zimmervergleich mit Atmosphaere und direktem Anfrageweg.",
-          description: "Zimmer, Features, Preise und Bilder sind als strukturierte Inhalte pflegbar.",
+          description: "Zimmer, Features, Preise und Bilder bleiben schnell vergleichbar.",
           rooms: [
             { title: "Panorama Suite", description: "Balkon, Bergblick, Spa-Zugang und Late Checkout.", price: "ab 219", features: ["Balkon", "Spa", "Dinner Option"], cta: templateButton("Suite anfragen", "/kontakt") },
             { title: "Garden Room", description: "Ruhige Terrasse, Naturmaterialien und Fruehstueck.", price: "ab 149", features: ["Terrasse", "Kingsize", "ruhig"], cta: templateButton("Zimmer anfragen", "/kontakt") },
-            { title: "Family Studio", description: "Mehr Raum, flexible Betten und kurze Wege.", price: "ab 189", features: ["4 Personen", "Kitchenette", "Bergblick"], cta: templateButton("Verfügbarkeit", "/kontakt") }
+            { title: "Family Studio", description: "Mehr Raum, flexible Betten und kurze Wege.", price: "ab 189", features: ["4 Personen", "Kitchenette", "Bergblick"], cta: templateButton("Verfuegbarkeit", "/kontakt") }
           ]
         }}
       />
@@ -373,7 +381,7 @@ function TemplateIndustryDeepDive({ data }: { data: TemplatePreviewData }) {
         data={{
           eyebrow: data.industry === "fitness" ? "Coaches" : "Team",
           headline: "Profile, die Vertrauen vor dem ersten Kontakt aufbauen.",
-          description: "Rollen, Schwerpunkte und persoenliche Details sind als CMS-Felder pflegbar.",
+          description: "Rollen, Schwerpunkte und persoenliche Details machen die Wahl leichter.",
           members: [
             { name: "Mara Leitner", role: "Lead", bio: "Verbindet Beratung, Qualitaet und eine klare Kundenerfahrung.", specialties: ["Beratung", "Qualitaet"] },
             { name: "Jonas Berger", role: "Experte", bio: "Macht Leistungen greifbar und beantwortet die wichtigsten Fragen.", specialties: ["Service", "Ablauf"] },
@@ -492,8 +500,7 @@ function TemplateLivePanel({ data }: { data: TemplatePreviewData }) {
           <p className="showcase-eyebrow">{copy.kicker}</p>
           <h2 className="mt-4 text-5xl font-black leading-[0.94] md:text-6xl">{copy.title}</h2>
           <p className="mt-6 max-w-xl text-lg leading-8 text-black/60">
-            Das ist der Unterschied zwischen “Template anschauen” und “echte Website erleben”:
-            Besucher sehen sofort die naechste sinnvolle Aktion.
+            Besucher sehen sofort die naechste sinnvolle Aktion und finden ohne Umwege zum passenden Angebot.
           </p>
         </div>
         <div className="grid gap-4 rounded-lg p-4 text-white" style={{ background: data.dark }}>
@@ -515,22 +522,138 @@ function TemplateLivePanel({ data }: { data: TemplatePreviewData }) {
   );
 }
 
-function TemplateNav({ data }: { data: TemplatePreviewData }) {
+function TemplateSubpage({ data, page }: { data: TemplatePreviewData; page: TemplateSubpageData }) {
+  return (
+    <>
+      <section className="relative overflow-hidden bg-ink px-5 py-20 text-white md:px-8 md:py-28">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center opacity-45"
+          style={{ backgroundImage: `url(${page.image})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/15" />
+        <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+          <div>
+            <p className="showcase-eyebrow text-white/70">{page.eyebrow}</p>
+            <h1 className="mt-5 max-w-5xl text-6xl font-black leading-[0.9] tracking-tight md:text-8xl">
+              {page.headline}
+            </h1>
+            <p className="mt-7 max-w-2xl text-xl leading-9 text-white/75">{page.description}</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a className="showcase-button showcase-button-light" href="/kontakt">
+                {page.ctaLabel}
+              </a>
+              <a
+                className="rounded-full border border-white/30 px-5 py-3 text-sm font-black text-white transition hover:bg-white hover:text-black"
+                href={`/templates/${data.industry}/${data.style}`}
+              >
+                Startseite
+              </a>
+            </div>
+          </div>
+          <div className="rounded-lg border border-white/10 bg-white/[0.08] p-4 backdrop-blur">
+            <div className="grid gap-3 rounded-md bg-white p-4 text-black">
+              {page.sections.flatMap((section) => section.items).slice(0, 3).map((item) => (
+                <article key={item.title} className="rounded-md bg-black/[0.04] p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <h2 className="text-xl font-black">{item.title}</h2>
+                    {item.meta ? (
+                      <span className="rounded-full px-3 py-1 text-xs font-black text-white" style={{ background: data.dark }}>
+                        {item.meta}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-3 text-sm font-bold leading-6 text-black/55">{item.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      {page.sections.map((section, index) => (
+        <TemplateSubpageSectionView key={`${page.slug}-${section.eyebrow}-${index}`} data={data} section={section} index={index} />
+      ))}
+    </>
+  );
+}
+
+function TemplateSubpageSectionView({
+  data,
+  section,
+  index
+}: {
+  data: TemplatePreviewData;
+  section: TemplateSubpageSection;
+  index: number;
+}) {
+  const dark = section.type === "lead" || section.type === "gallery";
+
+  return (
+    <section
+      className={`px-5 py-20 md:px-8 md:py-28 ${dark ? "text-white" : ""}`}
+      style={{ background: dark ? data.dark : index % 2 ? data.surface : "#ffffff" }}
+    >
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.72fr_1.28fr]">
+        <div>
+          <p className={`showcase-eyebrow ${dark ? "text-white/60" : ""}`}>{section.eyebrow}</p>
+          <h2 className="mt-4 text-5xl font-black leading-[0.96] md:text-6xl">{section.headline}</h2>
+          <p className={`mt-6 text-lg leading-8 ${dark ? "text-white/68" : "text-black/60"}`}>{section.body}</p>
+          {section.ctaLabel ? (
+            <a className={`mt-8 inline-flex ${dark ? "showcase-button showcase-button-light" : "showcase-button"}`} href="/kontakt">
+              {section.ctaLabel}
+            </a>
+          ) : null}
+        </div>
+        <div className={`grid gap-4 ${section.type === "timeline" ? "" : "md:grid-cols-2"}`}>
+          {section.items.map((item, itemIndex) => (
+            <article
+              key={`${item.title}-${itemIndex}`}
+              className={`rounded-lg border p-6 shadow-sm transition duration-300 hover:-translate-y-1 ${
+                dark ? "border-white/10 bg-white/[0.08]" : "border-black/10 bg-white"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <h3 className="text-2xl font-black">{item.title}</h3>
+                {item.meta ? (
+                  <span className={`rounded-full px-3 py-1 text-xs font-black ${dark ? "bg-white text-black" : "text-white"}`} style={dark ? undefined : { background: data.dark }}>
+                    {item.meta}
+                  </span>
+                ) : null}
+              </div>
+              <p className={`mt-4 leading-7 ${dark ? "text-white/68" : "text-black/60"}`}>{item.body}</p>
+              {item.price ? (
+                <p className="mt-6 text-3xl font-black" style={{ color: dark ? "#ffffff" : data.accent }}>
+                  {item.price}
+                </p>
+              ) : null}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TemplateNav({ data, activeSlug }: { data: TemplatePreviewData; activeSlug?: string }) {
   return (
     <div className="sticky top-[93px] z-30 border-b border-black/10 bg-white/88 px-5 py-3 backdrop-blur-xl md:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-        <a className="text-lg font-black tracking-[-0.03em]" href="/beispiele">
+        <a className="text-lg font-black tracking-[-0.03em]" href={`/templates/${data.industry}/${data.style}`}>
           {data.brand}
         </a>
         <nav className="hidden items-center gap-5 text-sm font-bold text-black/60 md:flex">
-          {data.nav.map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="hover:text-black">
-              {item}
+          {data.pages.map((item) => (
+            <a
+              key={item.slug}
+              href={`/templates/${data.industry}/${data.style}/${item.slug}`}
+              className={activeSlug === item.slug ? "text-black" : "hover:text-black"}
+            >
+              {item.label}
             </a>
           ))}
         </nav>
         <a className="showcase-button showcase-button-compact" href="/kontakt">
-          {data.nav[1] ?? "Anfragen"}
+          {data.pages[0]?.ctaLabel ?? "Anfragen"}
         </a>
       </div>
     </div>
@@ -603,7 +726,7 @@ function TemplateModules({ data }: { data: TemplatePreviewData }) {
           </div>
           <p className="text-lg leading-8 text-black/60">
             Preise, Leistungen, Verfuegbarkeit, Team, Lage und Kontaktwege sind nicht Deko. Sie
-            werden als echte CMS-Inhalte gefuehrt und koennen spaeter sauber gepflegt werden.
+            bilden die Entscheidungspunkte, auf die Besucher wirklich achten.
           </p>
         </div>
         <div className="mt-12 grid gap-4 md:grid-cols-3">
@@ -630,8 +753,8 @@ function TemplateSignature({ data }: { data: TemplatePreviewData }) {
             Ausgewaehlte Highlights.
           </h2>
           <p className="mt-5 text-lg leading-8 text-black/60">
-            Diese Liste ist exemplarisch, aber nicht abstrakt: genau solche Inhalte liegen spaeter
-            in Collections und koennen im Admin erweitert werden.
+            Diese Highlights geben Besuchern genug Substanz, um Vertrauen aufzubauen und die
+            naechste Entscheidung zu treffen.
           </p>
         </div>
         <div className="grid gap-3">
@@ -669,8 +792,8 @@ function TemplateGallery({ data }: { data: TemplatePreviewData }) {
             </h2>
           </div>
           <p className="max-w-md leading-7 text-white/70">
-            Grosse Bilder, klare Kontraste und passende Schnitte machen aus einer Template-Struktur
-            eine Seite mit eigenem Charakter.
+            Grosse Bilder, klare Kontraste und passende Schnitte geben der Marke eine eigene
+            visuelle Erinnerung.
           </p>
         </div>
         <div className="mt-12 grid gap-4 md:grid-cols-3">
