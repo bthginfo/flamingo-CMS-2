@@ -21,6 +21,15 @@ export type TemplatePreviewData = {
   quote: string;
   pages: TemplateSubpageData[];
   collections: TemplateCollectionData[];
+  styleExperience: TemplateStyleExperience;
+};
+
+export type TemplateStyleExperience = {
+  rhythm: string;
+  layout: "editorial" | "bento" | "showcase";
+  motion: string;
+  ctaPattern: string;
+  sectionVariant: "quiet" | "precise" | "kinetic";
 };
 
 const industryPages: Record<IndustryKey, Array<Omit<TemplateSubpageData, "image"> & { image?: string }>> = {
@@ -370,22 +379,43 @@ export type TemplateCollectionData = {
   fields: Array<{ name: string; type: string; label: string }>;
 };
 
-const styleTone: Record<StyleKey, { suffix: string; headline: string }> = {
+const styleTone: Record<StyleKey, { suffix: string; headline: string; experience: TemplateStyleExperience }> = {
   classic: {
     suffix: "Classic",
-    headline: "Ruhig, hochwertig und zeitlos inszeniert."
+    headline: "Ruhig, hochwertig und zeitlos inszeniert.",
+    experience: {
+      rhythm: "Editoriale Kapitel, ruhige Trust-Momente und grosszuegige Leseflaechen.",
+      layout: "editorial",
+      motion: "Weiche Reveals, dezente Hover-Zustaende und reduzierte Parallax-Tiefe.",
+      ctaPattern: "Zurueckhaltende, aber konstant auffindbare Buchungs- oder Anfragepunkte.",
+      sectionVariant: "quiet"
+    }
   },
   modern: {
     suffix: "Modern",
-    headline: "Editorial, schnell erfassbar und modular gedacht."
+    headline: "Editorial, schnell erfassbar und modular gedacht.",
+    experience: {
+      rhythm: "Praezise Bento-Module, klare Scanpfade und schnelle Vergleichbarkeit.",
+      layout: "bento",
+      motion: "Subtile Fokuswechsel, Inline-Feedback und smarte Section-Transitions.",
+      ctaPattern: "Kontextuelle CTAs direkt an Entscheidungspunkten.",
+      sectionVariant: "precise"
+    }
   },
   bold: {
     suffix: "Bold",
-    headline: "Praegnant, kontrastreich und auf Conversion gebaut."
+    headline: "Praegnant, kontrastreich und auf Conversion gebaut.",
+    experience: {
+      rhythm: "Starke Statements, hohe Bildspannung und sichtbare Conversion-Spots.",
+      layout: "showcase",
+      motion: "Spuerbare Reveals, sticky Conversion-Cues und scrollgebundene Betonung.",
+      ctaPattern: "Dominante CTAs mit klarer Prioritaet und hoher Wiedererkennbarkeit.",
+      sectionVariant: "kinetic"
+    }
   }
 };
 
-const base: Record<IndustryKey, Omit<TemplatePreviewData, "style" | "pages" | "collections">> = {
+const base: Record<IndustryKey, Omit<TemplatePreviewData, "style" | "pages" | "collections" | "styleExperience">> = {
   restaurant: {
     industry: "restaurant",
     label: "Restaurant",
@@ -851,6 +881,7 @@ export function getTemplatePreview(industry: string, style: string): TemplatePre
     style: styleKey,
     brand: `${base[key].brand} ${tone.suffix}`,
     headline: styleKey === "classic" ? base[key].headline : tone.headline,
+    styleExperience: tone.experience,
     pages: industryPages[key].map((page, index) => ({
       ...page,
       image: page.image ?? base[key].gallery[index % base[key].gallery.length] ?? base[key].image

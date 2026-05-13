@@ -18,6 +18,7 @@
       "@flamingo/db": ["packages/db/src/index.ts"],
       "@flamingo/db/client": ["packages/db/src/client.ts"],
       "@flamingo/db/form-repository": ["packages/db/src/form-repository.ts"],
+      "@flamingo/db/site-repository": ["packages/db/src/site-repository.ts"],
       "@flamingo/funding": ["packages/funding/src/index.ts"],
       "@flamingo/sections": ["packages/sections/src/index.tsx"],
       "@flamingo/shared": ["packages/shared/src/index.ts"]

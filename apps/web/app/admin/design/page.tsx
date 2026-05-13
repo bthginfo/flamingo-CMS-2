@@ -10,6 +10,21 @@ export default function DesignPage() {
     ["Background", theme?.backgroundColor ?? "#fbfaf8"],
     ["Text", theme?.textColor ?? "#101317"]
   ];
+  const semanticTokens = {
+    "surface.page": theme?.semanticTokens?.["surface.page"] ?? theme?.backgroundColor ?? "#fbfaf8",
+    "surface.raised": theme?.semanticTokens?.["surface.raised"] ?? "#ffffff",
+    "surface.inverse": theme?.semanticTokens?.["surface.inverse"] ?? "#101317",
+    "text.primary": theme?.semanticTokens?.["text.primary"] ?? theme?.textColor ?? "#101317",
+    "brand.primary": theme?.semanticTokens?.["brand.primary"] ?? theme?.primaryColor ?? "#f06472",
+    "cta.background": theme?.semanticTokens?.["cta.background"] ?? theme?.primaryColor ?? "#f06472"
+  };
+  const componentTokens = {
+    "button.primary.bg": theme?.componentTokens?.["button.primary.bg"] ?? semanticTokens["cta.background"],
+    "button.primary.text": theme?.componentTokens?.["button.primary.text"] ?? "#ffffff",
+    "card.bg": theme?.componentTokens?.["card.bg"] ?? semanticTokens["surface.raised"],
+    "card.border": theme?.componentTokens?.["card.border"] ?? "rgba(16,19,23,.10)",
+    "hero.overlay": theme?.componentTokens?.["hero.overlay"] ?? "linear-gradient(90deg, rgba(0,0,0,.78), rgba(0,0,0,.18))"
+  };
 
   return (
     <div className="grid gap-6">
@@ -20,10 +35,10 @@ export default function DesignPage() {
       />
 
       <div className="grid gap-4 md:grid-cols-4">
-        <AdminMetric label="Theme" value="Bold" detail="aktiver Showcase Style" />
+        <AdminMetric label="Theme" value={theme?.activeThemeId ?? "showcase-default"} detail={theme?.mode ?? "light"} />
         <AdminMetric label="Radius" value={theme?.radius ?? 18} detail="Komponenten-Rhythmus" />
         <AdminMetric label="Font" value={theme?.fontFamily ?? "Inter"} detail="Tenant Typografie" />
-        <AdminMetric label="Modes" value="1" detail="Light Theme aktiv" />
+        <AdminMetric label="Token Ebenen" value="3" detail="Primitive, Semantic, Component" />
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[0.85fr_1.15fr]">
@@ -50,6 +65,30 @@ export default function DesignPage() {
               <button className="showcase-button showcase-button-light">Primary CTA</button>
               <button className="showcase-button showcase-button-ghost-dark">Secondary</button>
             </div>
+          </div>
+        </AdminPanel>
+      </div>
+
+      <div className="grid gap-5 xl:grid-cols-2">
+        <AdminPanel title="Semantic Tokens">
+          <div className="grid gap-2">
+            {Object.entries(semanticTokens).map(([label, value]) => (
+              <label key={label} className="grid gap-2 rounded-lg border border-black/10 bg-paper p-3 text-sm font-bold md:grid-cols-[1fr_160px] md:items-center">
+                <span className="font-mono text-xs text-black/55">{label}</span>
+                <input className="rounded-md border border-black/10 bg-white p-2 font-mono text-xs" defaultValue={value} />
+              </label>
+            ))}
+          </div>
+        </AdminPanel>
+
+        <AdminPanel title="Component Mapping">
+          <div className="grid gap-2">
+            {Object.entries(componentTokens).map(([label, value]) => (
+              <label key={label} className="grid gap-2 rounded-lg border border-black/10 bg-paper p-3 text-sm font-bold md:grid-cols-[1fr_220px] md:items-center">
+                <span className="font-mono text-xs text-black/55">{label}</span>
+                <input className="rounded-md border border-black/10 bg-white p-2 font-mono text-xs" defaultValue={value} />
+              </label>
+            ))}
           </div>
         </AdminPanel>
       </div>

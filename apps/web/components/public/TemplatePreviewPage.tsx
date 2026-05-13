@@ -20,14 +20,15 @@ type TemplateBlock =
   | "signature"
   | "deepDive"
   | "modules"
+  | "styleSystem"
   | "highlights"
   | "gallery"
   | "process";
 
 const styleDramaturgy: Record<StyleKey, TemplateBlock[]> = {
-  classic: ["signature", "deepDive", "highlights", "gallery", "process", "live", "modules"],
-  modern: ["live", "modules", "deepDive", "signature", "process", "highlights", "gallery"],
-  bold: ["deepDive", "live", "gallery", "modules", "signature", "highlights", "process"]
+  classic: ["signature", "styleSystem", "deepDive", "highlights", "gallery", "process", "live", "modules"],
+  modern: ["live", "styleSystem", "modules", "deepDive", "signature", "process", "highlights", "gallery"],
+  bold: ["deepDive", "live", "styleSystem", "gallery", "modules", "signature", "highlights", "process"]
 };
 
 export function TemplatePreviewPage({ data, pageSlug }: { data: TemplatePreviewData; pageSlug?: string }) {
@@ -75,6 +76,10 @@ function TemplateBlockRenderer({
 
   if (block === "modules") {
     return <TemplateModules data={data} />;
+  }
+
+  if (block === "styleSystem") {
+    return <TemplateStyleSystem data={data} />;
   }
 
   if (block === "highlights") {
@@ -516,6 +521,56 @@ function TemplateLivePanel({ data }: { data: TemplatePreviewData }) {
               {copy.cta}
             </a>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TemplateStyleSystem({ data }: { data: TemplatePreviewData }) {
+  const experience = data.styleExperience;
+  const cards = [
+    { label: "Layout", value: experience.layout, body: experience.rhythm },
+    { label: "Motion", value: data.style, body: experience.motion },
+    { label: "CTA", value: experience.sectionVariant, body: experience.ctaPattern }
+  ];
+
+  return (
+    <section className="px-5 py-16 md:px-8 md:py-24" style={{ background: data.style === "bold" ? data.dark : "#ffffff" }}>
+      <div className={`mx-auto grid max-w-7xl gap-5 ${
+        experience.layout === "editorial"
+          ? "lg:grid-cols-[1.2fr_0.8fr]"
+          : experience.layout === "bento"
+            ? "lg:grid-cols-[0.8fr_1.2fr]"
+            : "lg:grid-cols-[1fr_1fr]"
+      }`}>
+        <div className={data.style === "bold" ? "text-white" : ""}>
+          <p className={`showcase-eyebrow ${data.style === "bold" ? "text-white/60" : ""}`}>{data.style} system</p>
+          <h2 className="mt-4 text-5xl font-black leading-[0.96] md:text-6xl">
+            {data.style === "classic"
+              ? "Ruhige Dramaturgie mit klassischer Hierarchie."
+              : data.style === "modern"
+                ? "Praezise Module fuer schnelle Entscheidungen."
+                : "Ein markanter Auftritt mit hohem Wiedererkennungswert."}
+          </h2>
+        </div>
+        <div className={`grid gap-3 ${experience.layout === "bento" ? "md:grid-cols-2" : ""}`}>
+          {cards.map((card, index) => (
+            <article
+              key={card.label}
+              className={`rounded-lg border p-5 shadow-sm transition hover:-translate-y-1 ${
+                data.style === "bold" ? "border-white/10 bg-white/[0.08] text-white" : "border-black/10 bg-paper"
+              } ${experience.layout === "showcase" && index === 0 ? "md:col-span-2" : ""}`}
+            >
+              <p className={`text-xs font-black uppercase tracking-[0.18em] ${data.style === "bold" ? "text-white/45" : "text-black/40"}`}>
+                {card.label}
+              </p>
+              <h3 className="mt-4 text-3xl font-black">{card.value}</h3>
+              <p className={`mt-4 leading-7 ${data.style === "bold" ? "text-white/68" : "text-black/60"}`}>
+                {card.body}
+              </p>
+            </article>
+          ))}
         </div>
       </div>
     </section>

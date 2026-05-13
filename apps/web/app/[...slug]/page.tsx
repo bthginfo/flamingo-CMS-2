@@ -2,7 +2,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { PageRenderer } from "../../components/public/PageRenderer";
 import { SiteShell } from "../../components/public/SiteShell";
-import { collections, getSiteContext } from "../../lib/seed";
+import { collections } from "../../lib/seed";
+import { getPublicSiteContext, getPublicSiteContextOrSeed } from "../../lib/site-context";
 
 type DetailCta = {
   label?: unknown;
@@ -58,9 +59,9 @@ function renderDetailValue(value: unknown) {
   return String(value);
 }
 
-export default function DynamicCmsPage({ params }: { params: { slug: string[] } }) {
+export default async function DynamicCmsPage({ params }: { params: { slug: string[] } }) {
   const path = `/${params.slug.join("/")}`;
-  const context = getSiteContext(path);
+  const context = await getPublicSiteContext(path);
 
   if (context) {
     return (
@@ -71,7 +72,9 @@ export default function DynamicCmsPage({ params }: { params: { slug: string[] } 
   }
 
   const [collectionKey, itemSlug] = params.slug;
-  const collection = collections.find((item) => item.key === collectionKey);
+  const shellContext = await getPublicSiteContextOrSeed("/") ?? notFound();
+  const collection = shellContext.collections.find((item) => item.key === collectionKey)
+    ?? collections.find((item) => item.key === collectionKey);
   const item = collection?.items.find(
     (candidate) =>
       candidate.slug === itemSlug &&
@@ -83,7 +86,6 @@ export default function DynamicCmsPage({ params }: { params: { slug: string[] } 
     notFound();
   }
 
-  const shellContext = getSiteContext("/") ?? notFound();
   const eyebrow = getString(item.data.eyebrow) || collection.itemLabel;
   const description =
     getString(item.data.description) || getString(item.data.excerpt) || getString(item.data.teaserText);

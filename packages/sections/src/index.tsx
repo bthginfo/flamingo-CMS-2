@@ -345,12 +345,19 @@ function SectionFrame({
   return (
     <section
       className={cn(
-        "showcase-band px-5 py-20 md:px-8 md:py-28",
+        "showcase-band px-5 md:px-8",
+        (!design?.spacing || design.spacing === "standard") && "py-20 md:py-28",
+        design?.spacing === "compact" && "py-12 md:py-16",
+        design?.spacing === "generous" && "py-24 md:py-36",
         background === "ink" && "bg-ink text-white",
         background === "brand" && "bg-flamingo text-white",
         background === "muted" && "bg-white",
         background === "paper" && "bg-paper"
       )}
+      data-card-style={design?.cardStyle ?? "outlined"}
+      data-layout={design?.layout ?? "editorial"}
+      data-media-weight={design?.mediaWeight ?? "balanced"}
+      data-theme-slot={design?.themeSlot ?? "default"}
     >
       <div
         className={cn(
@@ -1237,7 +1244,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "description", label: "Beschreibung", type: "textarea", required: true },
       { name: "primaryCta", label: "Primärer CTA", type: "button-group", required: true }
     ],
-    allowedPageTypes: ["home", "landing"]
+    allowedPageTypes: ["home", "landing"],
+    designRole: "fixed"
   },
   {
     type: "content",
@@ -1283,6 +1291,7 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "limit", label: "Limit", type: "number" }
     ],
     allowedPageTypes: ["home", "standard", "collection_index"],
+    designRole: "collection",
     requiresCollection: true
   },
   {
@@ -1375,7 +1384,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "items", label: "Kacheln", type: "repeater", required: true },
       { name: "icon", label: "Icons", type: "icon" }
     ],
-    allowedPageTypes: ["home", "standard", "landing"]
+    allowedPageTypes: ["home", "standard", "landing"],
+    designRole: "sortable"
   },
   {
     type: "gallery_mosaic",
@@ -1412,7 +1422,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "images", label: "Bilder", type: "repeater", required: true },
       { name: "image", label: "Bild", type: "image" }
     ],
-    allowedPageTypes: ["home", "standard", "collection_detail_template"]
+    allowedPageTypes: ["home", "standard", "collection_detail_template"],
+    designRole: "media"
   },
   {
     type: "testimonial_wall",
@@ -1475,7 +1486,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "plans", label: "Pakete", type: "repeater", required: true },
       { name: "featured", label: "Highlight", type: "boolean" }
     ],
-    allowedIndustries: ["hotel", "tourism", "salon", "consulting", "fitness", "real-estate"]
+    allowedIndustries: ["hotel", "tourism", "salon", "consulting", "fitness", "real-estate"],
+    designRole: "conversion"
   },
   {
     type: "location_hours",
@@ -1506,7 +1518,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "hours", label: "Oeffnungszeiten", type: "opening-hours", required: true },
       { name: "map", label: "Karte", type: "map" }
     ],
-    allowedIndustries: ["restaurant", "hotel", "tourism", "salon", "trades", "medical", "fitness", "real-estate", "wedding"]
+    allowedIndustries: ["restaurant", "hotel", "tourism", "salon", "trades", "medical", "fitness", "real-estate", "wedding"],
+    designRole: "trust"
   },
   {
     type: "logo_marquee",
@@ -1534,7 +1547,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "logos", label: "Eintraege", type: "repeater", required: true },
       { name: "image", label: "Logo", type: "image" }
     ],
-    disallowedIndustries: ["wedding"]
+    disallowedIndustries: ["wedding"],
+    designRole: "trust"
   },
   {
     type: "team_grid",
@@ -1560,7 +1574,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "members", label: "Team", type: "repeater", required: true },
       { name: "image", label: "Bild", type: "image" }
     ],
-    allowedIndustries: ["hotel", "tourism", "salon", "trades", "medical", "consulting", "fitness", "real-estate", "wedding"]
+    allowedIndustries: ["hotel", "tourism", "salon", "trades", "medical", "consulting", "fitness", "real-estate", "wedding"],
+    designRole: "trust"
   },
   {
     type: "menu_section",
@@ -1590,7 +1605,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "headline", label: "Headline", type: "text", required: true },
       { name: "categories", label: "Kategorien", type: "repeater", required: true }
     ],
-    allowedIndustries: ["restaurant", "salon", "fitness", "wedding"]
+    allowedIndustries: ["restaurant", "salon", "fitness", "wedding"],
+    designRole: "collection"
   },
   {
     type: "room_grid",
@@ -1616,7 +1632,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "rooms", label: "Zimmer", type: "repeater", required: true },
       { name: "image", label: "Bild", type: "image" }
     ],
-    allowedIndustries: ["hotel", "tourism"]
+    allowedIndustries: ["hotel", "tourism"],
+    designRole: "collection"
   },
   {
     type: "booking_panel",
@@ -1640,7 +1657,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "primaryCta", label: "CTA", type: "button-group", required: true },
       { name: "highlights", label: "Highlights", type: "repeater" }
     ],
-    allowedPageTypes: ["home", "standard", "landing"]
+    allowedPageTypes: ["home", "standard", "landing"],
+    designRole: "conversion"
   },
   {
     type: "property_grid",
@@ -1666,7 +1684,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "properties", label: "Objekte", type: "repeater", required: true },
       { name: "image", label: "Bild", type: "image" }
     ],
-    allowedIndustries: ["real-estate"]
+    allowedIndustries: ["real-estate"],
+    designRole: "collection"
   },
   {
     type: "lead_form_section",
@@ -1696,7 +1715,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "formKey", label: "Form Key", type: "form-picker", required: true },
       { name: "fields", label: "Felder", type: "repeater", required: true }
     ],
-    allowedPageTypes: ["home", "standard", "landing"]
+    allowedPageTypes: ["home", "standard", "landing"],
+    designRole: "conversion"
   },
   {
     type: "course_schedule",
@@ -1722,7 +1742,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "description", label: "Beschreibung", type: "textarea" },
       { name: "courses", label: "Kurse", type: "repeater", required: true }
     ],
-    allowedIndustries: ["fitness", "tourism", "wedding"]
+    allowedIndustries: ["fitness", "tourism", "wedding"],
+    designRole: "collection"
   },
   {
     type: "case_studies",
@@ -1748,7 +1769,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "description", label: "Beschreibung", type: "textarea" },
       { name: "cases", label: "Cases", type: "repeater", required: true }
     ],
-    allowedIndustries: ["trades", "consulting", "real-estate", "medical"]
+    allowedIndustries: ["trades", "consulting", "real-estate", "medical"],
+    designRole: "trust"
   },
   {
     type: "before_after_gallery",
@@ -1778,7 +1800,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "description", label: "Beschreibung", type: "textarea" },
       { name: "items", label: "Bildpaare", type: "repeater", required: true }
     ],
-    allowedIndustries: ["trades", "salon", "medical", "real-estate", "fitness"]
+    allowedIndustries: ["trades", "salon", "medical", "real-estate", "fitness"],
+    designRole: "media"
   },
   {
     type: "sticky_cta",
@@ -1803,7 +1826,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "primaryCta", label: "Primaerer CTA", type: "button-group", required: true },
       { name: "secondaryCta", label: "Sekundaerer CTA", type: "button-group" }
     ],
-    allowedPageTypes: ["home", "standard", "landing", "collection_detail_template"]
+    allowedPageTypes: ["home", "standard", "landing", "collection_detail_template"],
+    designRole: "conversion"
   },
   {
     type: "tirol_funding_calculator",

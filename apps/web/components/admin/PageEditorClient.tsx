@@ -19,12 +19,19 @@ export type AdminSectionLibraryItem = {
   category: SectionCategory;
   tags: string[];
   adminFields: AdminFieldDefinition[];
+  allowedIndustries?: string[];
+  allowedPageTypes?: string[];
+  designRole?: string;
 };
 
 type InspectorTab = "content" | "design" | "seo" | "animation";
 type DesignSpacing = NonNullable<Section["design"]["spacing"]>;
 type DesignBackground = NonNullable<Section["design"]["background"]>;
 type DesignContainer = NonNullable<Section["design"]["container"]>;
+type DesignLayout = NonNullable<Section["design"]["layout"]>;
+type DesignMediaWeight = NonNullable<Section["design"]["mediaWeight"]>;
+type DesignCardStyle = NonNullable<Section["design"]["cardStyle"]>;
+type DesignThemeSlot = NonNullable<Section["design"]["themeSlot"]>;
 type AnimationPreset = NonNullable<Section["animation"]["preset"]>;
 
 export function PageEditorClient({
@@ -254,10 +261,22 @@ export function PageEditorClient({
               <div className="flex items-center justify-between gap-3">
                 <p className="font-black">{section.label}</p>
                 <span className="rounded-full bg-black/[0.05] px-2 py-1 text-xs font-bold">
-                  {section.category}
+                  {section.designRole ?? section.category}
                 </span>
               </div>
               <p className="mt-2 text-sm leading-6 text-black/55">{section.description}</p>
+              <div className="mt-3 flex flex-wrap gap-1">
+                {(section.allowedIndustries?.length ? section.allowedIndustries : ["diese Branche"]).slice(0, 4).map((item) => (
+                  <span key={item} className="rounded-full bg-black/[0.04] px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-black/45">
+                    {item}
+                  </span>
+                ))}
+                {section.allowedPageTypes?.slice(0, 2).map((item) => (
+                  <span key={item} className="rounded-full bg-flamingo/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-flamingo">
+                    {item}
+                  </span>
+                ))}
+              </div>
               <button
                 className="mt-3 rounded-full bg-ink px-3 py-2 text-xs font-black text-white disabled:opacity-50"
                 disabled={state.pending !== null}
@@ -311,7 +330,11 @@ function SectionInspector({
   const [design, setDesign] = useState({
     spacing: section.design.spacing ?? "standard",
     background: section.design.background ?? "paper",
-    container: section.design.container ?? "default"
+    container: section.design.container ?? "default",
+    layout: section.design.layout ?? "editorial",
+    mediaWeight: section.design.mediaWeight ?? "balanced",
+    cardStyle: section.design.cardStyle ?? "outlined",
+    themeSlot: section.design.themeSlot ?? "default"
   });
   const [animation, setAnimation] = useState({
     preset: section.animation.preset ?? "fade-up",
@@ -336,7 +359,11 @@ function SectionInspector({
     setDesign({
       spacing: section.design.spacing ?? "standard",
       background: section.design.background ?? "paper",
-      container: section.design.container ?? "default"
+      container: section.design.container ?? "default",
+      layout: section.design.layout ?? "editorial",
+      mediaWeight: section.design.mediaWeight ?? "balanced",
+      cardStyle: section.design.cardStyle ?? "outlined",
+      themeSlot: section.design.themeSlot ?? "default"
     });
     setAnimation({
       preset: section.animation.preset ?? "fade-up",
@@ -400,6 +427,10 @@ function SectionInspector({
           <SelectField label="Spacing" value={design.spacing} options={["compact", "standard", "generous"]} onChange={(value) => setDesign({ ...design, spacing: value as DesignSpacing })} />
           <SelectField label="Background" value={design.background} options={["paper", "ink", "brand", "muted"]} onChange={(value) => setDesign({ ...design, background: value as DesignBackground })} />
           <SelectField label="Container" value={design.container} options={["narrow", "default", "wide", "full"]} onChange={(value) => setDesign({ ...design, container: value as DesignContainer })} />
+          <SelectField label="Layout" value={design.layout} options={["editorial", "bento", "showcase", "conversion", "timeline", "listing"]} onChange={(value) => setDesign({ ...design, layout: value as DesignLayout })} />
+          <SelectField label="Media Weight" value={design.mediaWeight} options={["low", "balanced", "high", "immersive"]} onChange={(value) => setDesign({ ...design, mediaWeight: value as DesignMediaWeight })} />
+          <SelectField label="Card Style" value={design.cardStyle} options={["minimal", "outlined", "elevated", "image-led"]} onChange={(value) => setDesign({ ...design, cardStyle: value as DesignCardStyle })} />
+          <SelectField label="Theme Slot" value={design.themeSlot} options={["default", "soft", "contrast", "accent"]} onChange={(value) => setDesign({ ...design, themeSlot: value as DesignThemeSlot })} />
           <button
             className="rounded-full bg-ink px-4 py-3 text-sm font-black text-white"
             onClick={() =>

@@ -26,7 +26,10 @@ export default function PageEditor({ params }: { params: { pageId: string } }) {
           description: section.description,
           category: section.category,
           tags: section.tags,
-          adminFields: section.adminFields
+          adminFields: section.adminFields,
+          allowedIndustries: section.allowedIndustries,
+          allowedPageTypes: section.allowedPageTypes,
+          designRole: section.designRole
         }))}
     />
   );

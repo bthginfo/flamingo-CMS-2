@@ -101,6 +101,10 @@ export type SectionDesignSettings = {
   spacing?: "compact" | "standard" | "generous";
   background?: "paper" | "ink" | "brand" | "muted";
   container?: "narrow" | "default" | "wide" | "full";
+  layout?: "editorial" | "bento" | "showcase" | "conversion" | "timeline" | "listing";
+  mediaWeight?: "low" | "balanced" | "high" | "immersive";
+  cardStyle?: "minimal" | "outlined" | "elevated" | "image-led";
+  themeSlot?: "default" | "soft" | "contrast" | "accent";
 };
 
 export type SectionAnimationSettings = {
@@ -170,6 +174,8 @@ export type SectionDefinition<TData = unknown> = {
   allowedPageTypes?: Array<Page["type"]>;
   allowedIndustries?: IndustryKey[];
   disallowedIndustries?: IndustryKey[];
+  allowedStyles?: StyleKey[];
+  designRole?: "fixed" | "sortable" | "conversion" | "collection" | "trust" | "media";
   requiresCollection?: boolean;
   isPremium?: boolean;
   isSystem?: boolean;
@@ -252,6 +258,11 @@ export type ThemeSettings = {
   textColor: string;
   radius: number;
   fontFamily: string;
+  activeThemeId?: string;
+  mode?: "light" | "dark";
+  primitiveTokens?: Record<string, string>;
+  semanticTokens?: Record<string, string>;
+  componentTokens?: Record<string, string>;
 };
 
 export type GlobalSettings = {
@@ -457,7 +468,11 @@ export const updateSectionInputSchema = z.object({
     .object({
       spacing: z.enum(["compact", "standard", "generous"]).optional(),
       background: z.enum(["paper", "ink", "brand", "muted"]).optional(),
-      container: z.enum(["narrow", "default", "wide", "full"]).optional()
+      container: z.enum(["narrow", "default", "wide", "full"]).optional(),
+      layout: z.enum(["editorial", "bento", "showcase", "conversion", "timeline", "listing"]).optional(),
+      mediaWeight: z.enum(["low", "balanced", "high", "immersive"]).optional(),
+      cardStyle: z.enum(["minimal", "outlined", "elevated", "image-led"]).optional(),
+      themeSlot: z.enum(["default", "soft", "contrast", "accent"]).optional()
     })
     .optional(),
   animation: z

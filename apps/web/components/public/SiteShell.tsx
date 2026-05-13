@@ -9,6 +9,14 @@ export function SiteShell({
   context: SiteContext;
   children: React.ReactNode;
 }) {
+  const themeStyle = {
+    ["--theme-primary" as string]: context.theme.semanticTokens?.["brand.primary"] ?? context.theme.primaryColor,
+    ["--theme-secondary" as string]: context.theme.semanticTokens?.["brand.secondary"] ?? context.theme.secondaryColor,
+    ["--theme-page" as string]: context.theme.semanticTokens?.["surface.page"] ?? context.theme.backgroundColor,
+    ["--theme-text" as string]: context.theme.semanticTokens?.["text.primary"] ?? context.theme.textColor,
+    ["--theme-radius" as string]: `${context.theme.radius}px`,
+    ["--theme-font" as string]: context.theme.fontFamily
+  };
   const navItems = [
     { id: "templates", label: "Templates", href: "/beispiele" },
     { id: "prozess", label: "Ablauf", href: "/prozess" },
@@ -18,7 +26,7 @@ export function SiteShell({
   ];
 
   return (
-    <div className="showcase-root min-h-screen bg-paper text-ink">
+    <div className="showcase-root min-h-screen bg-paper text-ink" style={themeStyle}>
       <header className="sticky top-0 z-40 border-b border-black/10 bg-[#fbfaf8]/88 px-5 py-3 backdrop-blur-xl md:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
           <a className="group flex items-center gap-3 text-lg font-black" href="/" aria-label="FlamingoMedia Home">
