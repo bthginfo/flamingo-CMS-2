@@ -92,6 +92,15 @@ const industryMeta: Record<IndustryKey, Omit<IndustryMeta, "key">> = {
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80",
     accent: "#34d399",
     modules: ["Objekte", "Bewertung", "Exposes"]
+  },
+  wedding: {
+    label: "Hochzeit",
+    tagline: "Story, Ablauf, RSVP",
+    description: "Persoenliche Hochzeitsseiten mit Ablauf, Gaesteinfos, Galerie und RSVP.",
+    image:
+      "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80",
+    accent: "#fb7185",
+    modules: ["Story", "Ablauf", "RSVP"]
   }
 };
 

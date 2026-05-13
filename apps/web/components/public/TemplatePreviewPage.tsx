@@ -1,10 +1,33 @@
 import { styles, type StyleKey } from "@flamingo/shared";
+import {
+  BookingPanelSection,
+  LeadFormSection,
+  MenuSection,
+  PropertyGridSection,
+  RoomGridSection,
+  TeamGridSection
+} from "@flamingo/sections";
 import type { TemplatePreviewData } from "./template-preview-data";
 
 const styleCopy: Record<StyleKey, string> = {
   classic: "Ruhig, hochwertig und mit viel Raum fuer Bilder und Vertrauen.",
   modern: "Modular, schnell erfassbar und perfekt fuer Besucher mit wenig Zeit.",
   bold: "Kontrastreich, direkt und gebaut fuer starke erste Eindruecke."
+};
+
+type TemplateBlock =
+  | "live"
+  | "signature"
+  | "deepDive"
+  | "modules"
+  | "highlights"
+  | "gallery"
+  | "process";
+
+const styleDramaturgy: Record<StyleKey, TemplateBlock[]> = {
+  classic: ["signature", "deepDive", "highlights", "gallery", "process", "live", "modules"],
+  modern: ["live", "modules", "deepDive", "signature", "process", "highlights", "gallery"],
+  bold: ["deepDive", "live", "gallery", "modules", "signature", "highlights", "process"]
 };
 
 export function TemplatePreviewPage({ data }: { data: TemplatePreviewData }) {
@@ -15,15 +38,46 @@ export function TemplatePreviewPage({ data }: { data: TemplatePreviewData }) {
     >
       <TemplateNav data={data} />
       <TemplateHero data={data} />
-      <TemplateLivePanel data={data} />
-      <TemplateIndustrySignature data={data} />
-      <TemplateModules data={data} />
-      <TemplateSignature data={data} />
-      <TemplateGallery data={data} />
-      <TemplateProcess data={data} />
+      {styleDramaturgy[data.style].map((block) => (
+        <TemplateBlockRenderer key={block} block={block} data={data} />
+      ))}
       <TemplateCta data={data} />
     </div>
   );
+}
+
+function TemplateBlockRenderer({
+  block,
+  data
+}: {
+  block: TemplateBlock;
+  data: TemplatePreviewData;
+}) {
+  if (block === "live") {
+    return <TemplateLivePanel data={data} />;
+  }
+
+  if (block === "signature") {
+    return <TemplateIndustrySignature data={data} />;
+  }
+
+  if (block === "deepDive") {
+    return <TemplateIndustryDeepDive data={data} />;
+  }
+
+  if (block === "modules") {
+    return <TemplateModules data={data} />;
+  }
+
+  if (block === "highlights") {
+    return <TemplateSignature data={data} />;
+  }
+
+  if (block === "gallery") {
+    return <TemplateGallery data={data} />;
+  }
+
+  return <TemplateProcess data={data} />;
 }
 
 const industrySignatureData: Record<
@@ -144,8 +198,30 @@ const industrySignatureData: Record<
     ],
     secondary: ["Objektstatus", "Expose Anfrage", "Verkaufsbewertung"],
     image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1300&q=85"
+  },
+  wedding: {
+    eyebrow: "Guest Journey",
+    title: "Story, Ablauf und RSVP fuehlen sich persoenlich an.",
+    lead: "Eine Hochzeitsseite darf nicht wie ein Business-Template wirken. Sie fuehrt Gaeste emotional durch Geschichte, Location, Tagesplan und Antwortformular.",
+    primary: [
+      { label: "Story", value: "Mara & Leo", meta: "seit 2018" },
+      { label: "Ablauf", value: "Freie Trauung", meta: "16:00" },
+      { label: "RSVP", value: "Zusage", meta: "bis 12.07." }
+    ],
+    secondary: ["Countdown", "Dresscode", "Unterkunft & Anreise"],
+    image: "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1300&q=85"
   }
 };
+
+function templateButton(label: string, href: string) {
+  return {
+    label,
+    href,
+    type: "external" as const,
+    openInNewTab: false,
+    styleVariant: "primary" as const
+  };
+}
 
 function TemplateIndustrySignature({ data }: { data: TemplatePreviewData }) {
   const signature = industrySignatureData[data.industry];
@@ -200,6 +276,133 @@ function TemplateIndustrySignature({ data }: { data: TemplatePreviewData }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function TemplateIndustryDeepDive({ data }: { data: TemplatePreviewData }) {
+  if (data.industry === "restaurant") {
+    return (
+      <MenuSection
+        design={{ background: "paper", container: "wide", spacing: "generous" }}
+        data={{
+          eyebrow: "A la carte",
+          headline: "Eine Karte, die nach Kueche klingt, nicht nach Datenbank.",
+          description: "Kategorien, Preise, Allergene und saisonale Hinweise bleiben im CMS editierbar.",
+          categories: [
+            {
+              name: "Aus der Kueche",
+              items: [
+                { title: "Burrata & Pfirsich", description: "Basilikum, Olivenoel, geröstete Mandeln", price: "14", badges: ["vegetarisch"] },
+                { title: "Truffle Tagliolini", description: "Hausgemachte Pasta, Pecorino, schwarzer Trueffel", price: "24", badges: ["Signature"] }
+              ]
+            },
+            {
+              name: "Am Abend",
+              items: [
+                { title: "Charred Octopus", description: "Zitrus, Fenchel, Chili-Oel", price: "28", badges: [] },
+                { title: "Amalfi Lemon Tart", description: "Baiser, Basilikum, Meersalz", price: "11", badges: ["Dessert"] }
+              ]
+            }
+          ]
+        }}
+      />
+    );
+  }
+
+  if (data.industry === "hotel") {
+    return (
+      <RoomGridSection
+        design={{ background: "muted", container: "wide", spacing: "generous" }}
+        data={{
+          eyebrow: "Zimmer",
+          headline: "Zimmervergleich mit Atmosphaere und direktem Anfrageweg.",
+          description: "Zimmer, Features, Preise und Bilder sind als strukturierte Inhalte pflegbar.",
+          rooms: [
+            { title: "Panorama Suite", description: "Balkon, Bergblick, Spa-Zugang und Late Checkout.", price: "ab 219", features: ["Balkon", "Spa", "Dinner Option"], cta: templateButton("Suite anfragen", "/kontakt") },
+            { title: "Garden Room", description: "Ruhige Terrasse, Naturmaterialien und Fruehstueck.", price: "ab 149", features: ["Terrasse", "Kingsize", "ruhig"], cta: templateButton("Zimmer anfragen", "/kontakt") },
+            { title: "Family Studio", description: "Mehr Raum, flexible Betten und kurze Wege.", price: "ab 189", features: ["4 Personen", "Kitchenette", "Bergblick"], cta: templateButton("Verfügbarkeit", "/kontakt") }
+          ]
+        }}
+      />
+    );
+  }
+
+  if (data.industry === "real-estate") {
+    return (
+      <PropertyGridSection
+        design={{ background: "paper", container: "wide", spacing: "generous" }}
+        data={{
+          eyebrow: "Objekte",
+          headline: "Objekte, Bewertung und Expose arbeiten in einem Funnel.",
+          description: "Kaeufer sehen Fakten schnell, Eigentuemer finden direkt den Bewertungsweg.",
+          properties: [
+            { title: "Penthouse West", location: "Innenstadt", price: "auf Anfrage", facts: ["124 qm", "Dachterrasse", "Lift"], cta: templateButton("Expose anfragen", "/kontakt") },
+            { title: "Townhouse Nord", location: "Familienlage", price: "890.000", facts: ["148 qm", "Garten", "4 Zimmer"], cta: templateButton("Besichtigung", "/kontakt") },
+            { title: "Altbau Studio", location: "Kulturviertel", price: "420.000", facts: ["68 qm", "Stuck", "Balkon"], cta: templateButton("Details", "/kontakt") }
+          ]
+        }}
+      />
+    );
+  }
+
+  if (data.industry === "wedding") {
+    return (
+      <LeadFormSection
+        design={{ background: "muted", container: "wide", spacing: "generous" }}
+        data={{
+          eyebrow: "RSVP",
+          headline: "Zusage, Begleitung und Hinweise an einem Ort.",
+          description: "Gaeste koennen direkt antworten, Allergien angeben und Songwuensche senden.",
+          formKey: "funding-lead",
+          fields: [
+            { name: "name", label: "Name", type: "text", required: true },
+            { name: "email", label: "E-Mail", type: "email", required: true },
+            { name: "message", label: "Begleitung, Allergien oder Songwunsch", type: "textarea", required: false }
+          ],
+          submitLabel: "Zusage senden",
+          privacyNote: "Die Angaben werden nur fuer die Hochzeitsplanung verwendet."
+        }}
+      />
+    );
+  }
+
+  if (["salon", "medical", "consulting", "fitness"].includes(data.industry)) {
+    return (
+      <TeamGridSection
+        design={{ background: "paper", container: "wide", spacing: "generous" }}
+        data={{
+          eyebrow: data.industry === "fitness" ? "Coaches" : "Team",
+          headline: "Profile, die Vertrauen vor dem ersten Kontakt aufbauen.",
+          description: "Rollen, Schwerpunkte und persoenliche Details sind als CMS-Felder pflegbar.",
+          members: [
+            { name: "Mara Leitner", role: "Lead", bio: "Verbindet Beratung, Qualitaet und eine klare Kundenerfahrung.", specialties: ["Beratung", "Qualitaet"] },
+            { name: "Jonas Berger", role: "Experte", bio: "Macht Leistungen greifbar und beantwortet die wichtigsten Fragen.", specialties: ["Service", "Ablauf"] },
+            { name: "Nina Hofer", role: "Kontakt", bio: "Begleitet Anfragen schnell und persoenlich zum passenden Termin.", specialties: ["Termine", "Support"] }
+          ]
+        }}
+      />
+    );
+  }
+
+  return (
+    <BookingPanelSection
+      design={{ background: "ink", container: "wide", spacing: "generous" }}
+      data={{
+        eyebrow: "Anfrage",
+        headline: "Aus Interesse wird eine klare naechste Aktion.",
+        description: "Leistung, Zeitraum, Dringlichkeit und Kontaktweg werden sichtbar gefuehrt.",
+        primaryCta: templateButton("Anfrage starten", "/kontakt"),
+        secondaryCta: {
+          label: "Referenzen ansehen",
+          href: "#module",
+          type: "pageSection",
+          sectionReference: "module",
+          openInNewTab: false,
+          styleVariant: "secondary"
+        },
+        highlights: ["schnelle Rueckmeldung", "qualifizierte Anfrage", "lokaler Kontext"]
+      }}
+    />
   );
 }
 
@@ -269,6 +472,13 @@ const industryPanelCopy: Record<
     left: "Penthouse West · 124 qm · Dachterrasse",
     right: "Expose, Region und Bewertungs-CTA arbeiten zusammen",
     cta: "Expose anfragen"
+  },
+  wedding: {
+    title: "Alle Gaeste wissen, wo sie wann sein sollen.",
+    kicker: "RSVP",
+    left: "Freie Trauung · 16:00 Uhr · Villa Rosengold",
+    right: "Zusage, Allergien, Songwuensche und Unterkunftshinweise laufen sauber zusammen",
+    cta: "Jetzt zusagen"
   }
 };
 

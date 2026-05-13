@@ -1,12 +1,6 @@
 import { AdminMetric, AdminPageHeader, AdminPanel } from "../../../components/admin/AdminUi";
+import { MediaLibraryClient } from "../../../components/admin/MediaLibraryClient";
 import { MediaUploadForm } from "../../../components/admin/MediaUploadForm";
-
-const sampleMedia = [
-  "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=900&q=80"
-];
 
 export default function MediaPage() {
   return (
@@ -33,18 +27,8 @@ export default function MediaPage() {
           <MediaUploadForm />
         </AdminPanel>
 
-        <AdminPanel title="Media Library Preview">
-          <div className="grid gap-3 md:grid-cols-2">
-            {sampleMedia.map((image, index) => (
-              <article key={image} className="overflow-hidden rounded-lg border border-black/10 bg-paper">
-                <div className="min-h-[220px] bg-cover bg-center" style={{ backgroundImage: `url(${image})` }} />
-                <div className="p-4">
-                  <p className="font-black">showcase-{index + 1}.jpg</p>
-                  <p className="mt-1 text-sm text-black/55">Hero, Gallery, Template Preview</p>
-                </div>
-              </article>
-            ))}
-          </div>
+        <AdminPanel title="Media Library">
+          <MediaLibraryClient />
         </AdminPanel>
       </div>
     </div>

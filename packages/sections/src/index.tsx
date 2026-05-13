@@ -2,11 +2,19 @@ import { z } from "zod";
 import type { SectionDefinition, SectionDesignSettings } from "@flamingo/cms-core";
 import type { SiteContext } from "@flamingo/cms-core";
 import { calculateTirolFunding, tirolFundingConfig } from "@flamingo/funding";
-import { cn } from "@flamingo/shared";
+import { cn, industries, styles } from "@flamingo/shared";
 
 export const buttonSchema = z.object({
   label: z.string(),
-  href: z.string()
+  type: z.enum(["external", "internalPage", "pageSection", "email", "phone"]).default("external"),
+  href: z.string().optional(),
+  externalUrl: z.string().optional(),
+  pageReference: z.string().optional(),
+  sectionReference: z.string().optional(),
+  openInNewTab: z.boolean().default(false),
+  ariaLabel: z.string().optional(),
+  styleVariant: z.enum(["primary", "secondary", "ghost", "text"]).default("primary"),
+  icon: z.string().optional()
 });
 
 export const heroSchema = z.object({
@@ -72,9 +80,49 @@ export const fundingCalculatorSchema = z.object({
 });
 
 const imageSchema = z.object({
-  src: z.string(),
-  alt: z.string()
+  sourceType: z.enum(["upload", "url", "embed"]).default("url"),
+  src: z.string().optional(),
+  imageFile: z.string().optional(),
+  url: z.string().optional(),
+  embedCode: z.string().optional(),
+  alt: z.string(),
+  caption: z.string().optional(),
+  focalPoint: z.object({ x: z.number(), y: z.number() }).optional(),
+  posterImage: z.string().optional()
 });
+
+type CmsButton = z.infer<typeof buttonSchema>;
+type CmsImage = z.infer<typeof imageSchema>;
+
+function getButtonHref(button: CmsButton) {
+  if (button.type === "email") {
+    return button.externalUrl?.startsWith("mailto:") ? button.externalUrl : `mailto:${button.externalUrl ?? ""}`;
+  }
+
+  if (button.type === "phone") {
+    return button.externalUrl?.startsWith("tel:") ? button.externalUrl : `tel:${button.externalUrl ?? ""}`;
+  }
+
+  if (button.type === "internalPage") {
+    return button.pageReference ?? button.href ?? "#";
+  }
+
+  if (button.type === "pageSection") {
+    return button.sectionReference?.startsWith("#")
+      ? button.sectionReference
+      : `#${button.sectionReference ?? ""}`;
+  }
+
+  return button.externalUrl ?? button.href ?? "#";
+}
+
+function getImageUrl(image: CmsImage) {
+  return image.imageFile ?? image.url ?? image.src ?? "";
+}
+
+function getObjectPosition(image: CmsImage) {
+  return image.focalPoint ? `${image.focalPoint.x}% ${image.focalPoint.y}%` : "center";
+}
 
 export const serviceBentoSchema = z.object({
   eyebrow: z.string().optional(),
@@ -140,6 +188,98 @@ export const logoMarqueeSchema = z.object({
   logos: z.array(z.object({ name: z.string(), image: imageSchema.optional() }))
 });
 
+export const teamGridSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string().optional(),
+  members: z.array(
+    z.object({
+      name: z.string(),
+      role: z.string(),
+      bio: z.string().optional(),
+      image: imageSchema.optional(),
+      specialties: z.array(z.string()).default([])
+    })
+  )
+});
+
+export const menuSectionSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string().optional(),
+  categories: z.array(
+    z.object({
+      name: z.string(),
+      items: z.array(
+        z.object({
+          title: z.string(),
+          description: z.string(),
+          price: z.string().optional(),
+          badges: z.array(z.string()).default([])
+        })
+      )
+    })
+  )
+});
+
+export const roomGridSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string().optional(),
+  rooms: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      price: z.string().optional(),
+      image: imageSchema.optional(),
+      features: z.array(z.string()).default([]),
+      cta: buttonSchema.optional()
+    })
+  )
+});
+
+export const bookingPanelSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string(),
+  primaryCta: buttonSchema,
+  secondaryCta: buttonSchema.optional(),
+  highlights: z.array(z.string()).default([])
+});
+
+export const propertyGridSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string().optional(),
+  properties: z.array(
+    z.object({
+      title: z.string(),
+      location: z.string(),
+      price: z.string(),
+      facts: z.array(z.string()).default([]),
+      image: imageSchema.optional(),
+      cta: buttonSchema.optional()
+    })
+  )
+});
+
+export const leadFormSectionSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string(),
+  formKey: z.string(),
+  fields: z.array(
+    z.object({
+      name: z.string(),
+      label: z.string(),
+      type: z.enum(["text", "email", "phone", "textarea", "date"]),
+      required: z.boolean().default(false)
+    })
+  ),
+  submitLabel: z.string(),
+  privacyNote: z.string().optional()
+});
+
 function SectionFrame({
   design,
   children
@@ -196,14 +336,18 @@ export function HeroSection({
           <div className="mt-8 flex flex-wrap gap-3">
             <a
               className="showcase-button showcase-button-light"
-              href={data.primaryCta.href}
+              href={getButtonHref(data.primaryCta)}
+              aria-label={data.primaryCta.ariaLabel}
+              target={data.primaryCta.openInNewTab ? "_blank" : undefined}
             >
               {data.primaryCta.label}
             </a>
             {data.secondaryCta ? (
               <a
                 className="rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-white transition hover:border-white hover:bg-white hover:text-ink"
-                href={data.secondaryCta.href}
+                href={getButtonHref(data.secondaryCta)}
+                aria-label={data.secondaryCta.ariaLabel}
+                target={data.secondaryCta.openInNewTab ? "_blank" : undefined}
               >
                 {data.secondaryCta.label}
               </a>
@@ -291,14 +435,18 @@ export function CtaSection({
         <div className="flex flex-wrap gap-3">
           <a
             className="showcase-button showcase-button-light"
-            href={data.primaryCta.href}
+            href={getButtonHref(data.primaryCta)}
+            aria-label={data.primaryCta.ariaLabel}
+            target={data.primaryCta.openInNewTab ? "_blank" : undefined}
           >
             {data.primaryCta.label}
           </a>
           {data.secondaryCta ? (
             <a
               className="rounded-full border border-white/30 px-5 py-3 text-sm font-bold text-white transition hover:bg-white hover:text-ink"
-              href={data.secondaryCta.href}
+              href={getButtonHref(data.secondaryCta)}
+              aria-label={data.secondaryCta.ariaLabel}
+              target={data.secondaryCta.openInNewTab ? "_blank" : undefined}
             >
               {data.secondaryCta.label}
             </a>
@@ -503,13 +651,16 @@ export function GalleryMosaicSection({
       <div className="mt-10 grid auto-rows-[260px] gap-4 md:grid-cols-4">
         {data.images.map((image, index) => (
           <figure
-            key={`${image.src}-${index}`}
+            key={`${getImageUrl(image)}-${index}`}
             className={cn(
               "overflow-hidden rounded-lg border border-white/10 bg-cover bg-center",
               index === 0 && "md:col-span-2 md:row-span-2",
               index === 3 && "md:col-span-2"
             )}
-            style={{ backgroundImage: `linear-gradient(to top, rgba(0,0,0,.42), transparent), url(${image.src})` }}
+            style={{
+              backgroundImage: `linear-gradient(to top, rgba(0,0,0,.42), transparent), url(${getImageUrl(image)})`,
+              backgroundPosition: getObjectPosition(image)
+            }}
           >
             <figcaption className="sr-only">{image.alt}</figcaption>
           </figure>
@@ -581,7 +732,12 @@ export function PricingCardsSection({
                 </li>
               ))}
             </ul>
-            <a className={cn("showcase-button mt-6", plan.featured && "showcase-button-light")} href={plan.cta.href}>
+            <a
+              className={cn("showcase-button mt-6", plan.featured && "showcase-button-light")}
+              href={getButtonHref(plan.cta)}
+              aria-label={plan.cta.ariaLabel}
+              target={plan.cta.openInNewTab ? "_blank" : undefined}
+            >
               {plan.cta.label}
             </a>
           </article>
@@ -651,6 +807,227 @@ export function LogoMarqueeSection({
   );
 }
 
+export function TeamGridSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof teamGridSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={design}>
+      {data.eyebrow ? <p className="showcase-eyebrow">{data.eyebrow}</p> : null}
+      <div className="mt-4 grid gap-6 md:grid-cols-[0.85fr_1.15fr] md:items-end">
+        <h2 className="text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+        {data.description ? <p className="text-lg leading-8 text-black/65">{data.description}</p> : null}
+      </div>
+      <div className="mt-10 grid gap-4 md:grid-cols-3">
+        {data.members.map((member) => (
+          <article key={member.name} className="overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm">
+            {member.image ? (
+              <div
+                className="min-h-[300px] bg-cover"
+                style={{
+                  backgroundImage: `url(${getImageUrl(member.image)})`,
+                  backgroundPosition: getObjectPosition(member.image)
+                }}
+              />
+            ) : null}
+            <div className="p-5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-black/40">{member.role}</p>
+              <h3 className="mt-3 text-2xl font-black">{member.name}</h3>
+              {member.bio ? <p className="mt-3 leading-7 text-black/60">{member.bio}</p> : null}
+              {member.specialties.length > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {member.specialties.map((item) => (
+                    <span key={item} className="rounded-full bg-paper px-3 py-1 text-xs font-bold text-black/55">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    </SectionFrame>
+  );
+}
+
+export function MenuSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof menuSectionSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={design}>
+      {data.eyebrow ? <p className="showcase-eyebrow">{data.eyebrow}</p> : null}
+      <h2 className="mt-4 max-w-4xl text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+      {data.description ? <p className="mt-5 max-w-2xl text-lg leading-8 text-black/65">{data.description}</p> : null}
+      <div className="mt-10 grid gap-5 lg:grid-cols-2">
+        {data.categories.map((category) => (
+          <article key={category.name} className="rounded-lg border border-black/10 bg-white p-6 shadow-sm">
+            <h3 className="text-3xl font-black">{category.name}</h3>
+            <div className="mt-6 grid gap-5">
+              {category.items.map((item) => (
+                <div key={item.title} className="border-b border-black/10 pb-5 last:border-0 last:pb-0">
+                  <div className="flex items-start justify-between gap-5">
+                    <div>
+                      <p className="text-xl font-black">{item.title}</p>
+                      <p className="mt-2 leading-7 text-black/60">{item.description}</p>
+                    </div>
+                    {item.price ? <p className="shrink-0 font-black">{item.price}</p> : null}
+                  </div>
+                  {item.badges.length > 0 ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {item.badges.map((badge) => (
+                        <span key={badge} className="rounded-full bg-paper px-2 py-1 text-xs font-bold text-black/50">{badge}</span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </SectionFrame>
+  );
+}
+
+export function RoomGridSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof roomGridSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={design}>
+      {data.eyebrow ? <p className="showcase-eyebrow">{data.eyebrow}</p> : null}
+      <h2 className="mt-4 max-w-4xl text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+      {data.description ? <p className="mt-5 max-w-2xl text-lg leading-8 text-black/65">{data.description}</p> : null}
+      <div className="mt-10 grid gap-4 md:grid-cols-3">
+        {data.rooms.map((room) => (
+          <article key={room.title} className="overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm">
+            {room.image ? (
+              <div className="min-h-[260px] bg-cover" style={{ backgroundImage: `url(${getImageUrl(room.image)})`, backgroundPosition: getObjectPosition(room.image) }} />
+            ) : null}
+            <div className="p-5">
+              <div className="flex items-start justify-between gap-4">
+                <h3 className="text-2xl font-black">{room.title}</h3>
+                {room.price ? <p className="rounded-full bg-ink px-3 py-1 text-xs font-black text-white">{room.price}</p> : null}
+              </div>
+              <p className="mt-3 leading-7 text-black/60">{room.description}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {room.features.map((feature) => <span key={feature} className="rounded-full bg-paper px-3 py-1 text-xs font-bold text-black/55">{feature}</span>)}
+              </div>
+              {room.cta ? <a className="showcase-button mt-5" href={getButtonHref(room.cta)}>{room.cta.label}</a> : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    </SectionFrame>
+  );
+}
+
+export function BookingPanelSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof bookingPanelSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={{ background: "ink", ...design }}>
+      <div className="grid gap-8 rounded-lg border border-white/10 bg-white/[0.06] p-6 text-white md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          {data.eyebrow ? <p className="showcase-eyebrow text-white/60">{data.eyebrow}</p> : null}
+          <h2 className="mt-3 text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-white/65">{data.description}</p>
+          {data.highlights.length > 0 ? (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {data.highlights.map((item) => <span key={item} className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/70">{item}</span>)}
+            </div>
+          ) : null}
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <a className="showcase-button showcase-button-light" href={getButtonHref(data.primaryCta)}>{data.primaryCta.label}</a>
+          {data.secondaryCta ? <a className="rounded-full border border-white/25 px-5 py-3 text-sm font-black text-white" href={getButtonHref(data.secondaryCta)}>{data.secondaryCta.label}</a> : null}
+        </div>
+      </div>
+    </SectionFrame>
+  );
+}
+
+export function PropertyGridSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof propertyGridSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={design}>
+      {data.eyebrow ? <p className="showcase-eyebrow">{data.eyebrow}</p> : null}
+      <h2 className="mt-4 max-w-4xl text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+      {data.description ? <p className="mt-5 max-w-2xl text-lg leading-8 text-black/65">{data.description}</p> : null}
+      <div className="mt-10 grid gap-4 md:grid-cols-3">
+        {data.properties.map((property) => (
+          <article key={property.title} className="overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm">
+            {property.image ? <div className="min-h-[260px] bg-cover" style={{ backgroundImage: `url(${getImageUrl(property.image)})`, backgroundPosition: getObjectPosition(property.image) }} /> : null}
+            <div className="p-5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-black/40">{property.location}</p>
+              <h3 className="mt-3 text-2xl font-black">{property.title}</h3>
+              <p className="mt-3 text-xl font-black text-flamingo">{property.price}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {property.facts.map((fact) => <span key={fact} className="rounded-full bg-paper px-3 py-1 text-xs font-bold text-black/55">{fact}</span>)}
+              </div>
+              {property.cta ? <a className="showcase-button mt-5" href={getButtonHref(property.cta)}>{property.cta.label}</a> : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    </SectionFrame>
+  );
+}
+
+export function LeadFormSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof leadFormSectionSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={design}>
+      <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+        <div>
+          {data.eyebrow ? <p className="showcase-eyebrow">{data.eyebrow}</p> : null}
+          <h2 className="mt-4 text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+          <p className="mt-5 text-lg leading-8 text-black/65">{data.description}</p>
+        </div>
+        <form action={`/api/public/forms/${data.formKey}/submissions`} method="post" className="grid gap-4 rounded-lg border border-black/10 bg-white p-6 shadow-sm">
+          {data.fields.map((field) => (
+            <label key={field.name} className="grid gap-2 text-sm font-bold">
+              {field.label}
+              {field.type === "textarea" ? (
+                <textarea name={field.name} required={field.required} className="min-h-[120px] rounded-xl border border-black/10 p-3" />
+              ) : (
+                <input name={field.name} required={field.required} type={field.type === "phone" ? "tel" : field.type} className="rounded-xl border border-black/10 p-3" />
+              )}
+            </label>
+          ))}
+          {data.privacyNote ? <p className="text-xs leading-5 text-black/45">{data.privacyNote}</p> : null}
+          <button className="showcase-button" type="submit">{data.submitLabel}</button>
+        </form>
+      </div>
+    </SectionFrame>
+  );
+}
+
 export const sectionDefinitions: SectionDefinition[] = [
   {
     type: "hero",
@@ -668,8 +1045,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       primaryCta: { label: "Projekt starten", href: "/kontakt" },
       secondaryCta: { label: "Beispiele ansehen", href: "/beispiele" },
       stats: [
-        { value: "9", label: "Branchen" },
-        { value: "27", label: "Style Presets" },
+        { value: String(industries.length), label: "Branchen" },
+        { value: String(industries.length * styles.length), label: "Style Presets" },
         { value: "100%", label: "CMS Content" }
       ]
     },
@@ -680,7 +1057,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "headline", label: "Headline", type: "text", required: true },
       { name: "description", label: "Beschreibung", type: "textarea", required: true },
       { name: "primaryCta", label: "Primärer CTA", type: "button-group", required: true }
-    ]
+    ],
+    allowedPageTypes: ["home", "landing"]
   },
   {
     type: "content",
@@ -725,6 +1103,7 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "collectionKey", label: "Collection", type: "collection-picker", required: true },
       { name: "limit", label: "Limit", type: "number" }
     ],
+    allowedPageTypes: ["home", "standard", "collection_index"],
     requiresCollection: true
   },
   {
@@ -816,7 +1195,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "description", label: "Beschreibung", type: "textarea" },
       { name: "items", label: "Kacheln", type: "repeater", required: true },
       { name: "icon", label: "Icons", type: "icon" }
-    ]
+    ],
+    allowedPageTypes: ["home", "standard", "landing"]
   },
   {
     type: "gallery_mosaic",
@@ -852,7 +1232,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "description", label: "Beschreibung", type: "textarea" },
       { name: "images", label: "Bilder", type: "repeater", required: true },
       { name: "image", label: "Bild", type: "image" }
-    ]
+    ],
+    allowedPageTypes: ["home", "standard", "collection_detail_template"]
   },
   {
     type: "testimonial_wall",
@@ -914,7 +1295,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "headline", label: "Headline", type: "text", required: true },
       { name: "plans", label: "Pakete", type: "repeater", required: true },
       { name: "featured", label: "Highlight", type: "boolean" }
-    ]
+    ],
+    allowedIndustries: ["hotel", "tourism", "salon", "consulting", "fitness", "real-estate"]
   },
   {
     type: "location_hours",
@@ -944,7 +1326,8 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "email", label: "E-Mail", type: "text" },
       { name: "hours", label: "Oeffnungszeiten", type: "opening-hours", required: true },
       { name: "map", label: "Karte", type: "map" }
-    ]
+    ],
+    allowedIndustries: ["restaurant", "hotel", "tourism", "salon", "trades", "medical", "fitness", "real-estate", "wedding"]
   },
   {
     type: "logo_marquee",
@@ -971,7 +1354,170 @@ export const sectionDefinitions: SectionDefinition[] = [
       { name: "headline", label: "Headline", type: "text" },
       { name: "logos", label: "Eintraege", type: "repeater", required: true },
       { name: "image", label: "Logo", type: "image" }
-    ]
+    ],
+    disallowedIndustries: ["wedding"]
+  },
+  {
+    type: "team_grid",
+    label: "Team Grid",
+    description: "Teamprofile mit Rolle, Bio, Bild und Schwerpunkten.",
+    category: "trust",
+    icon: "Users",
+    tags: ["team", "profile", "vertrauen"],
+    schema: teamGridSchema,
+    defaultData: {
+      eyebrow: "Team",
+      headline: "Menschen, denen man gerne vertraut.",
+      description: "Profile machen Kompetenz, Persoenlichkeit und Schwerpunkte sichtbar.",
+      members: [
+        { name: "Mara Leitner", role: "Inhaberin", bio: "Fuehrt Beratung, Qualitaet und Gaestekontakt zusammen.", specialties: ["Beratung", "Organisation"] },
+        { name: "Jonas Berger", role: "Experte", bio: "Verantwortet Umsetzung, Detailqualitaet und Kundenkommunikation.", specialties: ["Umsetzung", "Service"] }
+      ]
+    },
+    defaultDesign: { background: "paper", container: "wide", spacing: "standard" },
+    defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "members", label: "Team", type: "repeater", required: true },
+      { name: "image", label: "Bild", type: "image" }
+    ],
+    allowedIndustries: ["hotel", "tourism", "salon", "trades", "medical", "consulting", "fitness", "real-estate", "wedding"]
+  },
+  {
+    type: "menu_section",
+    label: "Menu Section",
+    description: "Speisen, Drinks, Leistungen oder Angebotslisten mit Kategorien.",
+    category: "collection",
+    icon: "Utensils",
+    tags: ["menu", "speisekarte", "preise"],
+    schema: menuSectionSchema,
+    defaultData: {
+      eyebrow: "Speisekarte",
+      headline: "Saisonal, klar und mit Liebe gekocht.",
+      description: "Gerichte, Preise und Hinweise bleiben im CMS sauber gepflegt.",
+      categories: [
+        {
+          name: "Signature",
+          items: [
+            { title: "Burrata & Pfirsich", description: "Basilikum, Olivenoel, geröstete Mandeln", price: "14", badges: ["vegetarisch"] },
+            { title: "Truffle Tagliolini", description: "Hausgemachte Pasta, Pecorino, schwarzer Trueffel", price: "24", badges: [] }
+          ]
+        }
+      ]
+    },
+    defaultDesign: { background: "paper", container: "wide", spacing: "standard" },
+    defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "categories", label: "Kategorien", type: "repeater", required: true }
+    ],
+    allowedIndustries: ["restaurant", "salon", "fitness", "wedding"]
+  },
+  {
+    type: "room_grid",
+    label: "Room Grid",
+    description: "Zimmer, Suiten oder Unterkunftsangebote mit Features und CTA.",
+    category: "collection",
+    icon: "BedDouble",
+    tags: ["zimmer", "hotel", "booking"],
+    schema: roomGridSchema,
+    defaultData: {
+      eyebrow: "Zimmer",
+      headline: "Rueckzugsorte mit direktem Buchungsweg.",
+      description: "Zimmer werden vergleichbar, atmosphaerisch und conversionstark dargestellt.",
+      rooms: [
+        { title: "Panorama Suite", description: "Balkon, Bergblick und Spa-Zugang.", price: "ab 219", features: ["Balkon", "Spa", "Fruehstueck"], cta: { label: "Suite anfragen", href: "/kontakt" } },
+        { title: "Garden Room", description: "Ruhige Lage, Terrasse und Naturmaterialien.", price: "ab 149", features: ["Terrasse", "Kingsize", "ruhig"], cta: { label: "Zimmer anfragen", href: "/kontakt" } }
+      ]
+    },
+    defaultDesign: { background: "muted", container: "wide", spacing: "standard" },
+    defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "rooms", label: "Zimmer", type: "repeater", required: true },
+      { name: "image", label: "Bild", type: "image" }
+    ],
+    allowedIndustries: ["hotel", "tourism"]
+  },
+  {
+    type: "booking_panel",
+    label: "Booking Panel",
+    description: "Starker Buchungs- oder Anfragebereich mit Highlights.",
+    category: "conversion",
+    icon: "CalendarCheck",
+    tags: ["booking", "cta", "conversion"],
+    schema: bookingPanelSchema,
+    defaultData: {
+      eyebrow: "Direkt anfragen",
+      headline: "Der naechste Schritt ist klar.",
+      description: "Kurzer Weg zu Buchung, Termin, Anfrage oder RSVP.",
+      primaryCta: { label: "Jetzt anfragen", href: "/kontakt" },
+      highlights: ["Antwort innerhalb von 24 Stunden", "Persoenliche Rueckmeldung"]
+    },
+    defaultDesign: { background: "ink", container: "wide", spacing: "generous" },
+    defaultAnimation: { preset: "reveal", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "primaryCta", label: "CTA", type: "button-group", required: true },
+      { name: "highlights", label: "Highlights", type: "repeater" }
+    ],
+    allowedPageTypes: ["home", "standard", "landing"]
+  },
+  {
+    type: "property_grid",
+    label: "Property Grid",
+    description: "Immobilienkarten mit Preis, Lage, Fakten und Expose-CTA.",
+    category: "collection",
+    icon: "Building2",
+    tags: ["immobilien", "objekte", "expose"],
+    schema: propertyGridSchema,
+    defaultData: {
+      eyebrow: "Objekte",
+      headline: "Ausgewaehlte Immobilien mit klaren Fakten.",
+      description: "Objektkarten helfen Interessenten schnell zu vergleichen.",
+      properties: [
+        { title: "Penthouse West", location: "Innenstadt", price: "auf Anfrage", facts: ["124 qm", "Dachterrasse", "Lift"], cta: { label: "Expose anfragen", href: "/kontakt" } },
+        { title: "Townhouse Nord", location: "Ruhige Wohnlage", price: "890.000", facts: ["148 qm", "Garten", "4 Zimmer"], cta: { label: "Besichtigung", href: "/kontakt" } }
+      ]
+    },
+    defaultDesign: { background: "paper", container: "wide", spacing: "standard" },
+    defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "properties", label: "Objekte", type: "repeater", required: true },
+      { name: "image", label: "Bild", type: "image" }
+    ],
+    allowedIndustries: ["real-estate"]
+  },
+  {
+    type: "lead_form_section",
+    label: "Lead Form Section",
+    description: "CMS-gesteuertes Formular fuer Anfragen, Termine, Probetrainings oder RSVP.",
+    category: "conversion",
+    icon: "MailPlus",
+    tags: ["formular", "lead", "rsvp"],
+    schema: leadFormSectionSchema,
+    defaultData: {
+      eyebrow: "Anfrage",
+      headline: "Senden Sie uns die wichtigsten Eckdaten.",
+      description: "Wir melden uns mit einer klaren Rueckmeldung und dem passenden naechsten Schritt.",
+      formKey: "funding-lead",
+      fields: [
+        { name: "name", label: "Name", type: "text", required: true },
+        { name: "email", label: "E-Mail", type: "email", required: true },
+        { name: "message", label: "Nachricht", type: "textarea", required: false }
+      ],
+      submitLabel: "Absenden",
+      privacyNote: "Ihre Angaben werden nur zur Bearbeitung der Anfrage verwendet."
+    },
+    defaultDesign: { background: "muted", container: "wide", spacing: "standard" },
+    defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "formKey", label: "Form Key", type: "form-picker", required: true },
+      { name: "fields", label: "Felder", type: "repeater", required: true }
+    ],
+    allowedPageTypes: ["home", "standard", "landing"]
   },
   {
     type: "tirol_funding_calculator",
@@ -1015,6 +1561,12 @@ export const sectionComponentMap = {
   pricing_cards: PricingCardsSection,
   location_hours: LocationHoursSection,
   logo_marquee: LogoMarqueeSection,
+  team_grid: TeamGridSection,
+  menu_section: MenuSection,
+  room_grid: RoomGridSection,
+  booking_panel: BookingPanelSection,
+  property_grid: PropertyGridSection,
+  lead_form_section: LeadFormSection,
   tirol_funding_calculator: TirolFundingCalculatorSection
 };
 

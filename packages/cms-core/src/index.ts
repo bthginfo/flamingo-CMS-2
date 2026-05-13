@@ -1,6 +1,8 @@
 import { z } from "zod";
 import type { IndustryKey, Locale, StyleKey } from "@flamingo/shared";
 
+export * from "./master-spec";
+
 export const tenantStatusSchema = z.enum(["draft", "active", "paused", "archived"]);
 export const pageStatusSchema = z.enum(["draft", "published", "archived"]);
 export const pageTypeSchema = z.enum([
@@ -172,6 +174,30 @@ export type SectionDefinition<TData = unknown> = {
   isPremium?: boolean;
   isSystem?: boolean;
 };
+
+export function isSectionAllowedForPage(
+  definition: SectionDefinition,
+  tenant: Pick<Tenant, "industry">,
+  page: Pick<Page, "type">
+): boolean {
+  if (definition.isSystem) {
+    return false;
+  }
+
+  if (definition.allowedIndustries && !definition.allowedIndustries.includes(tenant.industry)) {
+    return false;
+  }
+
+  if (definition.disallowedIndustries?.includes(tenant.industry)) {
+    return false;
+  }
+
+  if (definition.allowedPageTypes && !definition.allowedPageTypes.includes(page.type)) {
+    return false;
+  }
+
+  return true;
+}
 
 export type Section = {
   id: string;
@@ -431,6 +457,7 @@ export const updateSectionInputSchema = z.object({
     })
     .optional(),
   visible: z.boolean().optional(),
+  order: z.number().int().min(0).optional(),
   label: z.string().optional()
 });
 

@@ -57,7 +57,8 @@ const industryLabels: Record<IndustryKey, string> = {
   consulting: "Beratung",
   medical: "Praxis",
   fitness: "Fitness",
-  "real-estate": "Immobilien"
+  "real-estate": "Immobilien",
+  wedding: "Hochzeit"
 };
 
 const workspaceNav = [
@@ -221,7 +222,7 @@ export function AdminDemoClient() {
             <div className="grid grid-cols-3 gap-2">
               <MetricDark label="Visible" value={`${visibleCount}`} />
               <MetricDark label="Ready" value={`${readyCount}`} />
-              <MetricDark label="Routes" value="27" />
+              <MetricDark label="Routes" value={String(industries.length * styles.length)} />
             </div>
             {savedAt ? (
               <div className="mt-3 rounded-md border border-emerald-300/20 bg-emerald-300/10 p-3 text-xs font-black text-emerald-200">

@@ -252,6 +252,222 @@ export const collections: Collection[] = [
         updatedAt: now
       }
     ]
+  },
+  {
+    id: "collection_rooms",
+    tenantId: showcaseTenant.id,
+    key: "rooms",
+    label: "Hotel Zimmer",
+    itemLabel: "Zimmer",
+    detailPagesEnabled: true,
+    schema: {
+      eyebrow: "string",
+      description: "string",
+      teaserText: "string",
+      featuredImage: "string",
+      gallery: "array",
+      features: "array",
+      price: "string",
+      ctas: "array"
+    },
+    items: [
+      {
+        id: "room_panorama_suite",
+        tenantId: showcaseTenant.id,
+        collectionId: "collection_rooms",
+        title: "Panorama Suite",
+        slug: "panorama-suite",
+        status: "published",
+        hasDetailPage: true,
+        data: {
+          eyebrow: "Alpine Nest",
+          description: "Eine Suite fuer Gaeste, die Aussicht, Ruhe und Spa-Naehe suchen.",
+          teaserText: "Balkon, Bergblick, Late Checkout und direkter Spa-Zugang.",
+          featuredImage: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1600&q=85",
+          gallery: [
+            "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=80"
+          ],
+          features: ["Balkon", "Spa inklusive", "Kingsize Bett", "Bergblick"],
+          price: "ab 219 EUR",
+          ctas: [{ label: "Suite anfragen", href: "/kontakt" }]
+        },
+        seo: {
+          metaTitle: "Panorama Suite buchen",
+          metaDescription: "Panorama Suite mit Bergblick, Spa-Zugang und direkter Anfrage."
+        },
+        createdAt: now,
+        updatedAt: now
+      }
+    ]
+  },
+  {
+    id: "collection_menu_items",
+    tenantId: showcaseTenant.id,
+    key: "menu",
+    label: "Restaurant Speisekarte",
+    itemLabel: "Gericht",
+    detailPagesEnabled: true,
+    schema: {
+      description: "string",
+      teaserText: "string",
+      featuredImage: "string",
+      price: "string",
+      allergens: "array",
+      ctas: "array"
+    },
+    items: [
+      {
+        id: "menu_truffle_tagliolini",
+        tenantId: showcaseTenant.id,
+        collectionId: "collection_menu_items",
+        title: "Truffle Tagliolini",
+        slug: "truffle-tagliolini",
+        status: "published",
+        hasDetailPage: true,
+        data: {
+          eyebrow: "Casa Flamingo",
+          description: "Hausgemachte Tagliolini mit Pecorino, schwarzem Trueffel und einer seidigen Butteremulsion.",
+          teaserText: "Das Signature-Gericht fuer Abende mit Zeit.",
+          featuredImage: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1600&q=85",
+          price: "24 EUR",
+          allergens: ["Gluten", "Milch"],
+          ctas: [{ label: "Tisch reservieren", href: "/kontakt" }]
+        },
+        seo: {
+          metaTitle: "Truffle Tagliolini",
+          metaDescription: "Signature Pasta mit schwarzem Trueffel im Casa Flamingo."
+        },
+        createdAt: now,
+        updatedAt: now
+      }
+    ]
+  },
+  {
+    id: "collection_properties",
+    tenantId: showcaseTenant.id,
+    key: "properties",
+    label: "Immobilien",
+    itemLabel: "Objekt",
+    detailPagesEnabled: true,
+    schema: {
+      description: "string",
+      featuredImage: "string",
+      facts: "array",
+      price: "string",
+      location: "string",
+      ctas: "array"
+    },
+    items: [
+      {
+        id: "property_penthouse_west",
+        tenantId: showcaseTenant.id,
+        collectionId: "collection_properties",
+        title: "Penthouse West",
+        slug: "penthouse-west",
+        status: "published",
+        hasDetailPage: true,
+        data: {
+          eyebrow: "Haus & Hof",
+          description: "Dachterrasse, Stadtblick und ein Grundriss, der Wohnen und Arbeiten sauber trennt.",
+          teaserText: "124 qm, Lift, Dachterrasse, hochwertige Ausstattung.",
+          featuredImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=85",
+          facts: ["124 qm", "Dachterrasse", "Lift", "Innenstadt"],
+          price: "auf Anfrage",
+          location: "Innenstadt West",
+          ctas: [{ label: "Expose anfragen", href: "/kontakt" }]
+        },
+        seo: {
+          metaTitle: "Penthouse West",
+          metaDescription: "Premium-Penthouse mit Dachterrasse und Expose-Anfrage."
+        },
+        createdAt: now,
+        updatedAt: now
+      }
+    ]
+  },
+  {
+    id: "collection_wedding_schedule",
+    tenantId: showcaseTenant.id,
+    key: "wedding-schedule",
+    label: "Hochzeitsablauf",
+    itemLabel: "Programmpunkt",
+    detailPagesEnabled: true,
+    schema: {
+      description: "string",
+      time: "string",
+      location: "string",
+      featuredImage: "string",
+      ctas: "array"
+    },
+    items: [
+      {
+        id: "wedding_free_ceremony",
+        tenantId: showcaseTenant.id,
+        collectionId: "collection_wedding_schedule",
+        title: "Freie Trauung im Garten",
+        slug: "freie-trauung",
+        status: "published",
+        hasDetailPage: true,
+        data: {
+          eyebrow: "Mara & Leo",
+          description: "Wir sagen Ja unter alten Kastanien, begleitet von Musik, Familie und Freunden.",
+          teaserText: "Beginn 16:00 Uhr, bitte bis 15:40 Uhr eintreffen.",
+          time: "16:00 Uhr",
+          location: "Villa Rosengold",
+          featuredImage: "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1600&q=85",
+          ctas: [{ label: "Route ansehen", href: "/kontakt" }]
+        },
+        seo: {
+          metaTitle: "Freie Trauung Mara & Leo",
+          metaDescription: "Informationen zur freien Trauung, Uhrzeit und Location."
+        },
+        createdAt: now,
+        updatedAt: now
+      }
+    ]
+  },
+  {
+    id: "collection_posts",
+    tenantId: showcaseTenant.id,
+    key: "news",
+    label: "News",
+    itemLabel: "Beitrag",
+    detailPagesEnabled: true,
+    schema: {
+      excerpt: "string",
+      description: "string",
+      featuredImage: "string",
+      author: "string",
+      publishedAt: "string",
+      tags: "array"
+    },
+    items: [
+      {
+        id: "post_cms_templates",
+        tenantId: showcaseTenant.id,
+        collectionId: "collection_posts",
+        title: "Warum Branchen-Websites mehr brauchen als ein Theme",
+        slug: "branchen-websites-mehr-als-theme",
+        status: "published",
+        hasDetailPage: true,
+        data: {
+          eyebrow: "Insight",
+          excerpt: "Gute Templates entstehen aus Informationsarchitektur, nicht aus Farbschemata.",
+          description: "Restaurant, Hotel, Praxis und Hochzeit haben andere Besucherfragen, andere Conversion-Momente und andere Content-Tiefe. Ein CMS muss diese Unterschiede als Datenmodell und Rendering-Logik ernst nehmen.",
+          featuredImage: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=85",
+          author: "FlamingoMedia",
+          publishedAt: "2026-05-12",
+          tags: ["CMS", "Templates", "UX"]
+        },
+        seo: {
+          metaTitle: "Branchen-Websites brauchen mehr als ein Theme",
+          metaDescription: "Warum Premium-CMS-Templates mit echter Informationsarchitektur starten."
+        },
+        createdAt: now,
+        updatedAt: now
+      }
+    ]
   }
 ];
 

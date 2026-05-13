@@ -7,7 +7,8 @@ export const industries = [
   "consulting",
   "medical",
   "fitness",
-  "real-estate"
+  "real-estate",
+  "wedding"
 ] as const;
 
 export const styles = ["classic", "modern", "bold"] as const;

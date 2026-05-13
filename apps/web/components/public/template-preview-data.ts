@@ -435,6 +435,56 @@ const base: Record<IndustryKey, Omit<TemplatePreviewData, "style">> = {
       { title: "Kontakt ausloesen", body: "Bewertung und Expose-Anfrage werden als starke CTAs gefuehrt." }
     ],
     quote: "Makler-Website und Objekt-System fuehlen sich endlich wie ein zusammenhaengendes Produkt an."
+  },
+  wedding: {
+    industry: "wedding",
+    label: "Hochzeit",
+    brand: "Mara & Leo",
+    eyebrow: "Wedding Template",
+    headline: "Eine persoenliche Hochzeitsseite, die Gaeste wirklich begleitet.",
+    description:
+      "Story, Ablauf, Location, RSVP, Unterkunft, Dresscode, Galerie und Hinweise werden emotional und komplett CMS-driven gepflegt.",
+    image:
+      "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1800&q=85",
+    accent: "#fb7185",
+    dark: "#27151b",
+    surface: "#fff1f2",
+    nav: ["Story", "Ablauf", "RSVP", "Anreise"],
+    metrics: [
+      { value: "128", label: "Gaeste" },
+      { value: "42", label: "Tage" },
+      { value: "1", label: "Ja-Wort" }
+    ],
+    modules: [
+      {
+        title: "Unsere Geschichte",
+        body: "Kennenlernen, Antrag und gemeinsame Stationen als ruhige, persoenliche Storyline."
+      },
+      {
+        title: "Tagesablauf",
+        body: "Trauung, Empfang, Dinner, Party und Ansprechpartner sind fuer Gaeste schnell auffindbar."
+      },
+      {
+        title: "RSVP & Hinweise",
+        body: "Zusage, Begleitung, Allergien, Songwuensche und Unterkunft laufen ueber saubere Formulare."
+      }
+    ],
+    signature: [
+      { title: "Freie Trauung", detail: "16:00 Uhr im Garten der Villa Rosengold", price: "Ablauf" },
+      { title: "Dinner & Reden", detail: "Saisonales Menue, Familienreden, Dessertbar", price: "Abend" },
+      { title: "RSVP", detail: "Bitte bis 12. Juli mit Begleitung und Allergien antworten", price: "Antwort" }
+    ],
+    gallery: [
+      "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80"
+    ],
+    process: [
+      { title: "Einstimmen", body: "Hero, Countdown und Story schaffen Naehe statt Business-Optik." },
+      { title: "Orientieren", body: "Ablauf, Location, Dresscode und Unterkunft beantworten Gaestefragen." },
+      { title: "Zusagen", body: "RSVP sammelt Begleitung, Essen, Allergien und Songwuensche." }
+    ],
+    quote: "Eine Hochzeitsseite, die sich wie Mara und Leo anfuehlt und nicht wie ein Formular."
   }
 };
 

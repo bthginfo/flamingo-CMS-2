@@ -1,4 +1,5 @@
 import { formDefinitions } from "../../../lib/seed";
+import { LeadInboxClient } from "../../../components/admin/LeadInboxClient";
 
 export default function FormsPage() {
   return (
@@ -7,6 +8,7 @@ export default function FormsPage() {
       <p className="mt-2 text-black/60">
         Formular-Definitionen, Pflichtfelder, Benachrichtigungen und Eingänge pro Tenant.
       </p>
+      <LeadInboxClient initialForms={formDefinitions} />
       <div className="mt-8 grid gap-5 md:grid-cols-2">
         {formDefinitions.map((form) => (
           <article key={form.id} className="rounded-2xl bg-white p-6 shadow-sm">

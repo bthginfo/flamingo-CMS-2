@@ -6,6 +6,7 @@ import {
   createFormSubmissionInputSchema,
   createPageInputSchema,
   createPageSnapshot,
+  isSectionAllowedForPage,
   updateSectionInputSchema,
   type AuthenticatedUser,
   type AuditLog,
@@ -89,6 +90,54 @@ export function createAdminPage(user: AuthenticatedUser, input: unknown) {
   return page;
 }
 
+export function updateAdminPage(
+  user: AuthenticatedUser,
+  pageId: string,
+  input: Partial<Pick<Page, "title" | "slug" | "seo" | "status">>
+) {
+  requirePermission(user, "content:update");
+  const page = assertTenantScope(
+    pages.find((candidate) => candidate.id === pageId) ?? fail("Page not found"),
+    user.tenantId
+  );
+  const before = { ...page };
+
+  if (input.title !== undefined) {
+    page.title = input.title;
+  }
+
+  if (input.slug !== undefined) {
+    const cleanSlug = slugify(input.slug.replace(/^\//, ""));
+    const fullPath = cleanSlug ? `/${cleanSlug}` : "/";
+    const slugTaken = pages.some(
+      (candidate) =>
+        candidate.tenantId === user.tenantId &&
+        candidate.id !== page.id &&
+        candidate.fullPath === fullPath
+    );
+
+    if (slugTaken) {
+      throw new Error("Page slug already exists");
+    }
+
+    page.slug = cleanSlug;
+    page.fullPath = fullPath;
+  }
+
+  if (input.seo !== undefined) {
+    page.seo = { ...page.seo, ...input.seo };
+  }
+
+  if (input.status !== undefined) {
+    page.status = input.status;
+  }
+
+  page.updatedBy = user.id;
+  page.updatedAt = new Date();
+  audit(user, { action: "page_update", entityType: "page", entityId: page.id, before, after: page });
+  return page;
+}
+
 export function addSectionToPage(user: AuthenticatedUser, pageId: string, input: unknown) {
   requirePermission(user, "content:update");
   const page = assertTenantScope(
@@ -97,6 +146,12 @@ export function addSectionToPage(user: AuthenticatedUser, pageId: string, input:
   );
   const parsed = addSectionInputSchema.parse(input);
   const definition = getSectionDefinition(parsed.type) ?? fail("Section definition not found");
+  const tenant = page.tenantId === showcaseTenant.id ? showcaseTenant : fail("Tenant not found");
+
+  if (!isSectionAllowedForPage(definition, tenant, page)) {
+    throw new Error("Section is not allowed for this tenant industry or page type");
+  }
+
   const pageSections = sections
     .filter((section) => section.tenantId === user.tenantId && section.pageId === page.id)
     .sort((a, b) => a.order - b.order);
@@ -159,6 +214,20 @@ export function updateAdminSection(user: AuthenticatedUser, sectionId: string, i
   section.animation = { ...section.animation, ...parsed.animation };
   section.visible = parsed.visible ?? section.visible;
   section.label = parsed.label ?? section.label;
+
+  if (parsed.order !== undefined && parsed.order !== section.order) {
+    const siblings = sections
+      .filter((candidate) => candidate.tenantId === user.tenantId && candidate.pageId === section.pageId)
+      .sort((a, b) => a.order - b.order);
+    const withoutCurrent = siblings.filter((candidate) => candidate.id !== section.id);
+    const targetIndex = Math.max(0, Math.min(parsed.order, withoutCurrent.length));
+
+    withoutCurrent.splice(targetIndex, 0, section);
+    withoutCurrent.forEach((candidate, index) => {
+      candidate.order = index;
+    });
+  }
+
   section.updatedBy = user.id;
   section.updatedAt = new Date();
 
@@ -326,6 +395,48 @@ export function listFormSubmissions(user: AuthenticatedUser) {
   return formSubmissions.filter((submission) => submission.tenantId === user.tenantId);
 }
 
+export function updateFormSubmissionStatus(
+  user: AuthenticatedUser,
+  submissionId: string,
+  status: FormSubmission["status"]
+) {
+  requirePermission(user, "forms:read");
+  const submission = assertTenantScope(
+    formSubmissions.find((candidate) => candidate.id === submissionId) ?? fail("Submission not found"),
+    user.tenantId
+  );
+  const before = { ...submission };
+
+  submission.status = status;
+  audit(user, {
+    action: "form_submission_status_update",
+    entityType: "form_submission",
+    entityId: submission.id,
+    before,
+    after: submission
+  });
+  return submission;
+}
+
+export function exportFormSubmissionsCsv(user: AuthenticatedUser) {
+  const submissions = listFormSubmissions(user);
+  const keys = Array.from(
+    new Set(submissions.flatMap((submission) => Object.keys(submission.data)))
+  );
+  const header = ["id", "status", "sourcePage", "createdAt", ...keys];
+  const rows = submissions.map((submission) =>
+    header.map((key) => {
+      const value =
+        key in submission
+          ? String(submission[key as keyof FormSubmission] ?? "")
+          : String(submission.data[key] ?? "");
+      return `"${value.replace(/"/g, '""')}"`;
+    })
+  );
+
+  return [header.join(","), ...rows.map((row) => row.join(","))].join("\n");
+}
+
 export function createPublicFormSubmission(formKey: string, input: unknown) {
   const parsed = createFormSubmissionInputSchema.parse(input);
   const form = formDefinitions.find(
@@ -403,6 +514,28 @@ export function createMediaAsset(
     after: asset
   });
 
+  return asset;
+}
+
+export function updateMediaAsset(
+  user: AuthenticatedUser,
+  assetId: string,
+  input: Partial<Pick<MediaAsset, "alt" | "caption" | "focalPointX" | "focalPointY" | "tags">>
+) {
+  requirePermission(user, "media:upload");
+  const asset = assertTenantScope(
+    mediaAssets.find((candidate) => candidate.id === assetId) ?? fail("Media asset not found"),
+    user.tenantId
+  );
+  const before = { ...asset };
+
+  asset.alt = input.alt ?? asset.alt;
+  asset.caption = input.caption ?? asset.caption;
+  asset.focalPointX = input.focalPointX ?? asset.focalPointX;
+  asset.focalPointY = input.focalPointY ?? asset.focalPointY;
+  asset.tags = input.tags ?? asset.tags;
+  asset.updatedAt = new Date();
+  audit(user, { action: "media_update", entityType: "media_asset", entityId: asset.id, before, after: asset });
   return asset;
 }
 
