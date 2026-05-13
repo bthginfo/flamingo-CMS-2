@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { AdminFieldDefinition, Page, Section, SectionCategory } from "@flamingo/cms-core";
 import { adminFetch } from "./api-client";
+import { CmsFieldEditor } from "./CmsFieldEditor";
 
 type ActionState = {
   pending: string | null;
@@ -63,6 +64,7 @@ export function PageEditorClient({
       }, {}),
     [filteredLibrary]
   );
+  const selectedDefinition = library.find((item) => item.type === selectedSection?.type);
 
   async function mutate(label: string, url: string, body?: unknown, method = "POST") {
     setState({ pending: label, message: null, error: null });
@@ -224,6 +226,7 @@ export function PageEditorClient({
         {selectedSection ? (
           <>
             <SectionInspector
+              adminFields={selectedDefinition?.adminFields ?? []}
               mutate={mutate}
               page={page}
               section={selectedSection}
@@ -277,20 +280,34 @@ export function PageEditorClient({
 }
 
 function SectionInspector({
+  adminFields,
   page,
   section,
   tab,
   setTab,
   mutate
 }: {
+  adminFields: AdminFieldDefinition[];
   page: Page;
   section: Section;
   tab: InspectorTab;
   setTab: (tab: InspectorTab) => void;
   mutate: (label: string, url: string, body?: unknown, method?: string) => Promise<void>;
 }) {
-  const [dataJson, setDataJson] = useState(() => JSON.stringify(section.data, null, 2));
-  const [seoJson, setSeoJson] = useState(() => JSON.stringify(page.seo, null, 2));
+  const [sectionData, setSectionData] = useState<Record<string, unknown>>(() =>
+    typeof section.data === "object" && section.data !== null && !Array.isArray(section.data)
+      ? (section.data as Record<string, unknown>)
+      : {}
+  );
+  const [seo, setSeo] = useState({
+    metaTitle: page.seo.metaTitle ?? "",
+    metaDescription: page.seo.metaDescription ?? "",
+    ogTitle: page.seo.ogTitle ?? "",
+    ogDescription: page.seo.ogDescription ?? "",
+    ogImage: page.seo.ogImage ?? "",
+    canonical: page.seo.canonical ?? "",
+    robots: page.seo.robots ?? "index,follow"
+  });
   const [design, setDesign] = useState({
     spacing: section.design.spacing ?? "standard",
     background: section.design.background ?? "paper",
@@ -302,8 +319,20 @@ function SectionInspector({
   });
 
   useEffect(() => {
-    setDataJson(JSON.stringify(section.data, null, 2));
-    setSeoJson(JSON.stringify(page.seo, null, 2));
+    setSectionData(
+      typeof section.data === "object" && section.data !== null && !Array.isArray(section.data)
+        ? (section.data as Record<string, unknown>)
+        : {}
+    );
+    setSeo({
+      metaTitle: page.seo.metaTitle ?? "",
+      metaDescription: page.seo.metaDescription ?? "",
+      ogTitle: page.seo.ogTitle ?? "",
+      ogDescription: page.seo.ogDescription ?? "",
+      ogImage: page.seo.ogImage ?? "",
+      canonical: page.seo.canonical ?? "",
+      robots: page.seo.robots ?? "index,follow"
+    });
     setDesign({
       spacing: section.design.spacing ?? "standard",
       background: section.design.background ?? "paper",
@@ -315,16 +344,9 @@ function SectionInspector({
     });
   }, [page.seo, section]);
 
-  function parseJson(value: string) {
-    try {
-      return JSON.parse(value) as unknown;
-    } catch {
-      return null;
-    }
+  function updateField(name: string, value: unknown) {
+    setSectionData((current) => ({ ...current, [name]: value }));
   }
-
-  const parsedData = parseJson(dataJson);
-  const parsedSeo = parseJson(seoJson);
 
   return (
     <section className="rounded-2xl bg-white p-5 shadow-sm">
@@ -348,19 +370,24 @@ function SectionInspector({
 
       {tab === "content" ? (
         <div className="mt-4 grid gap-3">
-          <label className="grid gap-2 text-sm font-bold">
-            Section data
-            <textarea
-              className="min-h-[260px] rounded-xl border border-black/10 bg-[#fbfaf8] p-3 font-mono text-xs leading-5"
-              value={dataJson}
-              onChange={(event) => setDataJson(event.target.value)}
-            />
-          </label>
+          {adminFields.length ? (
+            adminFields.map((field) => (
+              <CmsFieldEditor
+                key={field.name}
+                field={field}
+                value={sectionData[field.name]}
+                onChange={(value) => updateField(field.name, value)}
+              />
+            ))
+          ) : (
+            <p className="rounded-xl bg-[#fbfaf8] p-3 text-sm font-bold text-black/55">
+              Fuer diesen Section-Typ sind noch keine Admin-Felder definiert.
+            </p>
+          )}
           <button
             className="rounded-full bg-ink px-4 py-3 text-sm font-black text-white disabled:opacity-50"
-            disabled={!parsedData}
             onClick={() =>
-              mutate("Content gespeichert", `/api/admin/sections/${section.id}`, { data: parsedData }, "PATCH")
+              mutate("Content gespeichert", `/api/admin/sections/${section.id}`, { data: sectionData }, "PATCH")
             }
           >
             Content speichern
@@ -386,16 +413,64 @@ function SectionInspector({
 
       {tab === "seo" ? (
         <div className="mt-4 grid gap-3">
-          <textarea
-            className="min-h-[220px] rounded-xl border border-black/10 bg-[#fbfaf8] p-3 font-mono text-xs leading-5"
-            value={seoJson}
-            onChange={(event) => setSeoJson(event.target.value)}
+          <label className="grid gap-2 text-sm font-bold">
+            Meta Title
+            <input
+              className="rounded-xl border border-black/10 bg-[#fbfaf8] p-3 text-sm"
+              value={seo.metaTitle}
+              onChange={(event) => setSeo({ ...seo, metaTitle: event.target.value })}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold">
+            Meta Description
+            <textarea
+              className="min-h-[90px] rounded-xl border border-black/10 bg-[#fbfaf8] p-3 text-sm leading-6"
+              value={seo.metaDescription}
+              onChange={(event) => setSeo({ ...seo, metaDescription: event.target.value })}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold">
+            OG Title
+            <input
+              className="rounded-xl border border-black/10 bg-[#fbfaf8] p-3 text-sm"
+              value={seo.ogTitle}
+              onChange={(event) => setSeo({ ...seo, ogTitle: event.target.value })}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold">
+            OG Description
+            <textarea
+              className="min-h-[80px] rounded-xl border border-black/10 bg-[#fbfaf8] p-3 text-sm leading-6"
+              value={seo.ogDescription}
+              onChange={(event) => setSeo({ ...seo, ogDescription: event.target.value })}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold">
+            OG Image
+            <input
+              className="rounded-xl border border-black/10 bg-[#fbfaf8] p-3 text-sm"
+              value={seo.ogImage}
+              onChange={(event) => setSeo({ ...seo, ogImage: event.target.value })}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold">
+            Canonical
+            <input
+              className="rounded-xl border border-black/10 bg-[#fbfaf8] p-3 text-sm"
+              value={seo.canonical}
+              onChange={(event) => setSeo({ ...seo, canonical: event.target.value })}
+            />
+          </label>
+          <SelectField
+            label="Robots"
+            value={seo.robots}
+            options={["index,follow", "noindex,nofollow"]}
+            onChange={(value) => setSeo({ ...seo, robots: value as "index,follow" | "noindex,nofollow" })}
           />
           <button
-            className="rounded-full bg-ink px-4 py-3 text-sm font-black text-white disabled:opacity-50"
-            disabled={!parsedSeo}
+            className="rounded-full bg-ink px-4 py-3 text-sm font-black text-white"
             onClick={() =>
-              mutate("SEO gespeichert", `/api/admin/pages/${page.id}`, { seo: parsedSeo }, "PATCH")
+              mutate("SEO gespeichert", `/api/admin/pages/${page.id}`, { seo }, "PATCH")
             }
           >
             SEO speichern

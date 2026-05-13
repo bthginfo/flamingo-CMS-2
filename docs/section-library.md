@@ -44,7 +44,15 @@ Zusaetzlich zu den bestehenden Basis-Sections sind jetzt produktiv gerendert:
 - `booking_panel`
 - `property_grid`
 - `lead_form_section`
+- `course_schedule`
+- `case_studies`
+- `before_after_gallery`
+- `sticky_cta`
 
 Diese Sections besitzen jeweils Schema, Default Data, Admin Fields,
 Branchen-/Seitentyp-Regeln und Renderer. Sie sind im Add-Section-Flow sichtbar,
 sobald Branche und Page-Type sie erlauben.
+
+Damit ist der urspruengliche Phase-4-Pool fast vollstaendig im produktiven
+Registry-System angekommen. Noch offen sind vor allem die feinere
+Map/Opening-Hours-UX und ein wirklich interaktives FAQ-Accordion im Frontend.

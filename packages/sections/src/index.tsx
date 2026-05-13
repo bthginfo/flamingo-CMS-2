@@ -280,6 +280,60 @@ export const leadFormSectionSchema = z.object({
   privacyNote: z.string().optional()
 });
 
+export const courseScheduleSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string().optional(),
+  courses: z.array(
+    z.object({
+      title: z.string(),
+      day: z.string(),
+      time: z.string(),
+      level: z.string().optional(),
+      trainer: z.string().optional(),
+      cta: buttonSchema.optional()
+    })
+  )
+});
+
+export const caseStudiesSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string().optional(),
+  cases: z.array(
+    z.object({
+      title: z.string(),
+      client: z.string().optional(),
+      challenge: z.string(),
+      result: z.string(),
+      image: imageSchema.optional(),
+      cta: buttonSchema.optional()
+    })
+  )
+});
+
+export const beforeAfterGallerySchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string().optional(),
+  items: z.array(
+    z.object({
+      title: z.string(),
+      beforeImage: imageSchema,
+      afterImage: imageSchema,
+      caption: z.string().optional()
+    })
+  )
+});
+
+export const stickyCtaSchema = z.object({
+  eyebrow: z.string().optional(),
+  headline: z.string(),
+  description: z.string().optional(),
+  primaryCta: buttonSchema,
+  secondaryCta: buttonSchema.optional()
+});
+
 function SectionFrame({
   design,
   children
@@ -1028,6 +1082,131 @@ export function LeadFormSection({
   );
 }
 
+export function CourseScheduleSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof courseScheduleSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={design}>
+      {data.eyebrow ? <p className="showcase-eyebrow">{data.eyebrow}</p> : null}
+      <div className="mt-4 grid gap-6 md:grid-cols-[0.8fr_1.2fr] md:items-end">
+        <h2 className="text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+        {data.description ? <p className="text-lg leading-8 text-black/65">{data.description}</p> : null}
+      </div>
+      <div className="mt-10 grid gap-3">
+        {data.courses.map((course) => (
+          <article key={`${course.day}-${course.time}-${course.title}`} className="grid gap-4 rounded-lg border border-black/10 bg-white p-5 shadow-sm md:grid-cols-[160px_1fr_auto] md:items-center">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.14em] text-flamingo">{course.day}</p>
+              <p className="mt-1 text-2xl font-black">{course.time}</p>
+            </div>
+            <div>
+              <h3 className="text-2xl font-black">{course.title}</h3>
+              <p className="mt-2 text-sm font-bold text-black/52">
+                {[course.level, course.trainer].filter(Boolean).join(" · ")}
+              </p>
+            </div>
+            {course.cta ? <a className="showcase-button" href={getButtonHref(course.cta)}>{course.cta.label}</a> : null}
+          </article>
+        ))}
+      </div>
+    </SectionFrame>
+  );
+}
+
+export function CaseStudiesSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof caseStudiesSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={design}>
+      {data.eyebrow ? <p className="showcase-eyebrow">{data.eyebrow}</p> : null}
+      <h2 className="mt-4 max-w-4xl text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+      {data.description ? <p className="mt-5 max-w-2xl text-lg leading-8 text-black/65">{data.description}</p> : null}
+      <div className="mt-10 grid gap-5 md:grid-cols-3">
+        {data.cases.map((item) => (
+          <article key={item.title} className="overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm">
+            {item.image ? <div className="min-h-[230px] bg-cover" style={{ backgroundImage: `url(${getImageUrl(item.image)})`, backgroundPosition: getObjectPosition(item.image) }} /> : null}
+            <div className="p-5">
+              {item.client ? <p className="text-xs font-black uppercase tracking-[0.16em] text-black/40">{item.client}</p> : null}
+              <h3 className="mt-3 text-2xl font-black">{item.title}</h3>
+              <p className="mt-4 text-sm font-bold uppercase tracking-[0.12em] text-black/35">Aufgabe</p>
+              <p className="mt-2 leading-7 text-black/65">{item.challenge}</p>
+              <p className="mt-4 text-sm font-bold uppercase tracking-[0.12em] text-flamingo">Ergebnis</p>
+              <p className="mt-2 font-black leading-7">{item.result}</p>
+              {item.cta ? <a className="showcase-button mt-5" href={getButtonHref(item.cta)}>{item.cta.label}</a> : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    </SectionFrame>
+  );
+}
+
+export function BeforeAfterGallerySection({
+  data,
+  design
+}: {
+  data: z.infer<typeof beforeAfterGallerySchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={design}>
+      {data.eyebrow ? <p className="showcase-eyebrow">{data.eyebrow}</p> : null}
+      <h2 className="mt-4 max-w-4xl text-5xl font-black leading-[0.96] tracking-tight md:text-6xl">{data.headline}</h2>
+      {data.description ? <p className="mt-5 max-w-2xl text-lg leading-8 text-black/65">{data.description}</p> : null}
+      <div className="mt-10 grid gap-5 md:grid-cols-2">
+        {data.items.map((item) => (
+          <article key={item.title} className="rounded-lg border border-black/10 bg-white p-4 shadow-sm">
+            <h3 className="mb-4 text-2xl font-black">{item.title}</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <figure>
+                <div className="min-h-[260px] rounded-md bg-cover" style={{ backgroundImage: `url(${getImageUrl(item.beforeImage)})`, backgroundPosition: getObjectPosition(item.beforeImage) }} />
+                <figcaption className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-black/40">Vorher</figcaption>
+              </figure>
+              <figure>
+                <div className="min-h-[260px] rounded-md bg-cover" style={{ backgroundImage: `url(${getImageUrl(item.afterImage)})`, backgroundPosition: getObjectPosition(item.afterImage) }} />
+                <figcaption className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-flamingo">Nachher</figcaption>
+              </figure>
+            </div>
+            {item.caption ? <p className="mt-4 leading-7 text-black/65">{item.caption}</p> : null}
+          </article>
+        ))}
+      </div>
+    </SectionFrame>
+  );
+}
+
+export function StickyCtaSection({
+  data,
+  design
+}: {
+  data: z.infer<typeof stickyCtaSchema>;
+  design?: SectionDesignSettings;
+}) {
+  return (
+    <SectionFrame design={{ background: "paper", spacing: "compact", ...design }}>
+      <div className="sticky bottom-4 z-20 grid gap-4 rounded-lg border border-black/10 bg-white/92 p-4 shadow-soft backdrop-blur md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          {data.eyebrow ? <p className="text-xs font-black uppercase tracking-[0.16em] text-flamingo">{data.eyebrow}</p> : null}
+          <h2 className="mt-1 text-2xl font-black">{data.headline}</h2>
+          {data.description ? <p className="mt-1 text-sm leading-6 text-black/60">{data.description}</p> : null}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <a className="showcase-button" href={getButtonHref(data.primaryCta)}>{data.primaryCta.label}</a>
+          {data.secondaryCta ? <a className="rounded-full border border-black/15 px-5 py-3 text-sm font-black" href={getButtonHref(data.secondaryCta)}>{data.secondaryCta.label}</a> : null}
+        </div>
+      </div>
+    </SectionFrame>
+  );
+}
+
 export const sectionDefinitions: SectionDefinition[] = [
   {
     type: "hero",
@@ -1520,6 +1699,113 @@ export const sectionDefinitions: SectionDefinition[] = [
     allowedPageTypes: ["home", "standard", "landing"]
   },
   {
+    type: "course_schedule",
+    label: "Course Schedule",
+    description: "Kursplan, Programmpunkte oder wiederkehrende Termine mit Buchungs-CTA.",
+    category: "collection",
+    icon: "CalendarDays",
+    tags: ["kurse", "schedule", "programm", "booking"],
+    schema: courseScheduleSchema,
+    defaultData: {
+      eyebrow: "Kursplan",
+      headline: "Ein Plan, der Entscheidungen leicht macht.",
+      description: "Zeiten, Level, Trainer und Anmeldung bleiben als strukturierte CMS-Daten pflegbar.",
+      courses: [
+        { title: "Strength Flow", day: "Montag", time: "18:00", level: "All Levels", trainer: "Mara", cta: { label: "Platz sichern", href: "/kontakt" } },
+        { title: "Mobility Reset", day: "Mittwoch", time: "07:30", level: "Beginner", trainer: "Jonas", cta: { label: "Probetraining", href: "/kontakt" } }
+      ]
+    },
+    defaultDesign: { background: "paper", container: "wide", spacing: "standard" },
+    defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "description", label: "Beschreibung", type: "textarea" },
+      { name: "courses", label: "Kurse", type: "repeater", required: true }
+    ],
+    allowedIndustries: ["fitness", "tourism", "wedding"]
+  },
+  {
+    type: "case_studies",
+    label: "Case Studies",
+    description: "Referenzen, Projektberichte oder Beratungs-Cases mit Ergebnisfokus.",
+    category: "showcase",
+    icon: "BriefcaseBusiness",
+    tags: ["cases", "referenzen", "projekte", "trust"],
+    schema: caseStudiesSchema,
+    defaultData: {
+      eyebrow: "Referenzen",
+      headline: "Arbeit, die man nachvollziehen kann.",
+      description: "Cases zeigen Ausgangslage, Entscheidung und Ergebnis ohne austauschbare Versprechen.",
+      cases: [
+        { title: "Leadflow fuer lokalen Anbieter", client: "Beratung", challenge: "Unklare Angebotsseiten und zu wenig qualifizierte Anfragen.", result: "Mehr passende Erstgespraeche durch klare Angebotsdramaturgie.", cta: { label: "Case ansehen", href: "/beispiele" } },
+        { title: "Relaunch mit Collection-Struktur", client: "Hotel", challenge: "Zimmer, Angebote und News waren schwer pflegbar.", result: "Redaktionelle Pflege ohne Entwickler und staerkere Direktanfragen.", cta: { label: "Mehr erfahren", href: "/beispiele" } }
+      ]
+    },
+    defaultDesign: { background: "muted", container: "wide", spacing: "standard" },
+    defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "description", label: "Beschreibung", type: "textarea" },
+      { name: "cases", label: "Cases", type: "repeater", required: true }
+    ],
+    allowedIndustries: ["trades", "consulting", "real-estate", "medical"]
+  },
+  {
+    type: "before_after_gallery",
+    label: "Before/After Gallery",
+    description: "Vorher-Nachher-Galerie fuer Umbauten, Treatments, Styling oder Projekte.",
+    category: "media",
+    icon: "ScanSearch",
+    tags: ["before-after", "galerie", "vergleich", "referenzen"],
+    schema: beforeAfterGallerySchema,
+    defaultData: {
+      eyebrow: "Vorher / Nachher",
+      headline: "Der Unterschied wird sichtbar.",
+      description: "Ideal fuer Gewerke, Salon, Praxis, Immobilienaufbereitung und hochwertige Projektstories.",
+      items: [
+        {
+          title: "Projekt mit sichtbarer Wirkung",
+          beforeImage: { src: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80", alt: "Vorher Zustand" },
+          afterImage: { src: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=80", alt: "Nachher Zustand" },
+          caption: "Die Bildpaare bleiben mit Alt-Text, Caption und Fokuspunkt CMS-faehig."
+        }
+      ]
+    },
+    defaultDesign: { background: "paper", container: "wide", spacing: "standard" },
+    defaultAnimation: { preset: "reveal", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "description", label: "Beschreibung", type: "textarea" },
+      { name: "items", label: "Bildpaare", type: "repeater", required: true }
+    ],
+    allowedIndustries: ["trades", "salon", "medical", "real-estate", "fitness"]
+  },
+  {
+    type: "sticky_cta",
+    label: "Sticky CTA",
+    description: "Persistenter Conversion-Spot fuer Buchung, Anfrage, RSVP oder Beratung.",
+    category: "conversion",
+    icon: "BadgePlus",
+    tags: ["sticky", "cta", "conversion", "booking"],
+    schema: stickyCtaSchema,
+    defaultData: {
+      eyebrow: "Naechster Schritt",
+      headline: "Bereit, konkret zu werden?",
+      description: "Ein dezenter, mobiler Conversion-Anker fuer Besucher mit hoher Kaufabsicht.",
+      primaryCta: { label: "Jetzt anfragen", href: "/kontakt" },
+      secondaryCta: { label: "Mehr ansehen", href: "#details" }
+    },
+    defaultDesign: { background: "paper", container: "wide", spacing: "compact" },
+    defaultAnimation: { preset: "fade-up", reducedMotionSafe: true },
+    adminFields: [
+      { name: "headline", label: "Headline", type: "text", required: true },
+      { name: "description", label: "Beschreibung", type: "textarea" },
+      { name: "primaryCta", label: "Primaerer CTA", type: "button-group", required: true },
+      { name: "secondaryCta", label: "Sekundaerer CTA", type: "button-group" }
+    ],
+    allowedPageTypes: ["home", "standard", "landing", "collection_detail_template"]
+  },
+  {
     type: "tirol_funding_calculator",
     label: "Tirol Förderrechner",
     description: "Unverbindlicher Fördercheck für Digitalisierungsprojekte in Tirol.",
@@ -1567,6 +1853,10 @@ export const sectionComponentMap = {
   booking_panel: BookingPanelSection,
   property_grid: PropertyGridSection,
   lead_form_section: LeadFormSection,
+  course_schedule: CourseScheduleSection,
+  case_studies: CaseStudiesSection,
+  before_after_gallery: BeforeAfterGallerySection,
+  sticky_cta: StickyCtaSection,
   tirol_funding_calculator: TirolFundingCalculatorSection
 };
 

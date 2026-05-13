@@ -20,6 +20,8 @@ Abnahmekriterien:
 
 ## Phase 2 - CMS Field Engine
 
+Status: teilweise umgesetzt.
+
 Abnahmekriterien:
 
 - Field Renderer fuer `text`, `textarea`, `richText`, `number`, `boolean`,
@@ -31,6 +33,17 @@ Abnahmekriterien:
 - Media Editor unterstuetzt Upload, URL, Embed, Alt, Caption, Focal Point,
   Poster und Video-Flags.
 - Design, SEO und Animation Tabs speichern echte Section/Page-Daten.
+
+Aktueller Stand:
+
+- Der Page Editor nutzt eine feldbasierte CMS Field Engine fuer Section Content
+  statt eines reinen JSON-Inspectors.
+- Button-Objekte koennen Zieltyp, URL, interne Seite, Section, E-Mail/Telefon,
+  Aria-Label, neuen Tab und Style-Variante bearbeiten.
+- Media-Objekte koennen Quelle, URL/Asset, Alt, Caption, Focal Point und Embed
+  bearbeiten.
+- Repeater und Spezialfelder bleiben vorerst als strukturierte JSON-Felder
+  editierbar, bis itemspezifische Nested-Builder folgen.
 
 ## Phase 3 - Page Editor 2026
 
@@ -45,6 +58,8 @@ Abnahmekriterien:
 
 ## Phase 4 - Section Library Production
 
+Status: weitgehend umgesetzt.
+
 Abnahmekriterien:
 
 - Produktive Sections: Team Grid, Room Grid, Menu Section, Course Schedule,
@@ -52,6 +67,14 @@ Abnahmekriterien:
   Sticky CTA, Map/Opening Hours, FAQ Accordion.
 - Jede Section hat Schema, Default Data, Admin Fields, Design Settings,
   Renderer, mobile QA und passende Branchen/Page-Type-Zuordnung.
+
+Aktueller Stand:
+
+- Produktiv registriert sind jetzt 22 Sections inklusive Team Grid, Room Grid,
+  Menu Section, Course Schedule, Property Grid, Case Studies, Booking Panel,
+  Lead Form, Before/After Gallery, Sticky CTA und Location/Hours.
+- Offen bleiben die feinere Map/Opening-Hours-Bedienung, ein interaktives
+  FAQ-Accordion und systematische mobile QA.
 
 ## Phase 5 - Branchen-Templates
 
