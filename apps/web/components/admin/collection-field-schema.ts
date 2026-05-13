@@ -73,11 +73,11 @@ export function collectionSchemaToAdminFields(schema: Record<string, unknown>): 
   return Object.entries(schema).map(([key, value]) => {
     const type = String(value);
 
-    if (type === "array") {
+    if (["array", "list", "repeater", "multiSelect", "gallery", "links"].includes(type)) {
       return arrayField(key);
     }
 
-    if (isImageKey(key)) {
+    if (type === "image" || type === "media" || isImageKey(key)) {
       return {
         name: key,
         label: labelFromKey(key),

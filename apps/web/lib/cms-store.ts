@@ -447,6 +447,11 @@ export function createCollectionItem(
     throw new Error("Collection item slug already exists");
   }
 
+  const data = validateCollectionData(collection.schema, {
+    ...parsed.data,
+    description: parsed.description
+  });
+
   const item = {
     id: id("item"),
     tenantId: user.tenantId,
@@ -455,10 +460,7 @@ export function createCollectionItem(
     slug: cleanSlug,
     status: parsed.status,
     hasDetailPage: parsed.hasDetailPage,
-    data: {
-      ...parsed.data,
-      description: parsed.description
-    },
+    data,
     seo: {
       metaTitle: parsed.title,
       metaDescription: parsed.description
@@ -509,7 +511,7 @@ export function updateCollectionItem(
 
   item.status = parsed.status ?? item.status;
   item.hasDetailPage = parsed.hasDetailPage ?? item.hasDetailPage;
-  item.data = parsed.data ? { ...item.data, ...parsed.data } : item.data;
+  item.data = parsed.data ? validateCollectionData(collection.schema, { ...item.data, ...parsed.data }) : item.data;
   item.seo = parsed.seo ? { ...item.seo, ...parsed.seo } : item.seo;
   item.updatedAt = new Date();
 
@@ -521,6 +523,49 @@ export function updateCollectionItem(
     after: item
   });
   return item;
+}
+
+function validateCollectionData(schema: Record<string, unknown>, data: Record<string, unknown>) {
+  const errors: string[] = [];
+
+  for (const [key, rawType] of Object.entries(schema)) {
+    const type = String(rawType);
+    const value = data[key];
+
+    if (value === undefined || value === null || value === "") {
+      continue;
+    }
+
+    if (["string", "text", "richText", "textarea", "date"].includes(type) && typeof value !== "string") {
+      errors.push(`${key} muss Text sein`);
+    }
+
+    if (type === "number" && typeof value !== "number") {
+      errors.push(`${key} muss eine Zahl sein`);
+    }
+
+    if (type === "boolean" && typeof value !== "boolean") {
+      errors.push(`${key} muss true/false sein`);
+    }
+
+    if (["array", "list", "repeater", "multiSelect", "gallery", "links"].includes(type) && !Array.isArray(value)) {
+      errors.push(`${key} muss eine Liste sein`);
+    }
+
+    if (
+      ["image", "media", "video"].includes(type) &&
+      typeof value !== "string" &&
+      !(typeof value === "object" && value !== null && !Array.isArray(value))
+    ) {
+      errors.push(`${key} muss ein Medienobjekt oder eine URL sein`);
+    }
+  }
+
+  if (errors.length) {
+    throw new Error(`Collection data failed schema validation: ${errors.join(", ")}`);
+  }
+
+  return data;
 }
 
 export function deleteCollectionItem(

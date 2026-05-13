@@ -264,11 +264,11 @@ export const collections: Collection[] = [
       eyebrow: "string",
       description: "string",
       teaserText: "string",
-      featuredImage: "string",
-      gallery: "array",
-      features: "array",
+      featuredImage: "image",
+      gallery: "gallery",
+      features: "list",
       price: "string",
-      ctas: "array"
+      ctas: "links"
     },
     items: [
       {
@@ -311,10 +311,10 @@ export const collections: Collection[] = [
     schema: {
       description: "string",
       teaserText: "string",
-      featuredImage: "string",
+      featuredImage: "image",
       price: "string",
-      allergens: "array",
-      ctas: "array"
+      allergens: "list",
+      ctas: "links"
     },
     items: [
       {
@@ -352,11 +352,11 @@ export const collections: Collection[] = [
     detailPagesEnabled: true,
     schema: {
       description: "string",
-      featuredImage: "string",
-      facts: "array",
+      featuredImage: "image",
+      facts: "list",
       price: "string",
       location: "string",
-      ctas: "array"
+      ctas: "links"
     },
     items: [
       {
@@ -397,8 +397,8 @@ export const collections: Collection[] = [
       description: "string",
       time: "string",
       location: "string",
-      featuredImage: "string",
-      ctas: "array"
+      featuredImage: "image",
+      ctas: "links"
     },
     items: [
       {
@@ -437,10 +437,10 @@ export const collections: Collection[] = [
     schema: {
       excerpt: "string",
       description: "string",
-      featuredImage: "string",
+      featuredImage: "image",
       author: "string",
       publishedAt: "string",
-      tags: "array"
+      tags: "list"
     },
     items: [
       {
